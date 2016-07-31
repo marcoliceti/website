@@ -1,0 +1,59 @@
+@font-face {
+  font-family: open-sans;
+  src: url(../fonts/open-sans-light.ttf);
+}
+
+@font-face {
+  font-family: open-sans;
+  src: url(../fonts/open-sans-bold.ttf);
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: open-sans;
+  src: url(../fonts/open-sans-italic.ttf);
+  font-style: italic;
+}
+
+body {
+  font-family: open-sans;
+  margin: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.site_title {
+  margin-bottom: 2vh;
+  font-weight: bold;
+}
+
+.site_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.site_content .item {
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+}
+
+.site_content .item a {
+  display: block;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  border-radius: 3px;
+  width: 25vw;
+  color: rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+.site_content .item a:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid white;
+}
