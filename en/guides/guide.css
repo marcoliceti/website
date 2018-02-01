@@ -18,21 +18,27 @@
 body {
   font-family: open-sans;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-top: 5vh;
   margin-bottom: 25vh;
   color: rgb(64, 64, 64);
   font-size: 2vh;
 }
 
+.guide {
+  animation-duration: 2s;
+  animation-name: fade-in;
+}
+
 @media screen and (orientation: landscape) {
-  .guide {
+  .guide, #disqus_thread {
     width: 66vh;
   }
 }
 
 @media screen and (orientation: portrait) {
-  .guide {
+  .guide, #disqus_thread {
     max-width: 80vw;
   }
 }

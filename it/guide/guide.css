@@ -18,7 +18,8 @@
 body {
   font-family: open-sans;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-top: 5vh;
   margin-bottom: 25vh;
   color: rgb(64, 64, 64);
@@ -26,13 +27,13 @@ body {
 }
 
 @media screen and (orientation: landscape) {
-  .guida {
+  .guida, #disqus_thread {
     width: 66vh;
   }
 }
 
 @media screen and (orientation: portrait) {
-  .guida {
+  .guida, #disqus_thread {
     max-width: 80vw;
   }
 }
