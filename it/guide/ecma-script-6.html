@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ECMAScript 6</title>
+    <link rel="stylesheet" href="guide.css">
+  </head>
+  <body>
+    <div class="guida">
+<h1 id="ecmascript-6">ECMAScript 6</h1>
+<h2 id="sommario">Sommario</h2>
+<p>Lo scopo di questa guida è quello di presentare in maniera chiara e breve alcune
+delle funzionalità più importanti introdotte con ECMAScript 6. In particolare il
+focus è sulle funzionalità di uso più comune e non saranno invece trattate
+quelle comunque importanti ma più pertinenti allo sviluppo di librerie e
+framework.</p>
+<p>Questa guida è inoltre rivolta a lettori che abbiano già esperienza di sviluppo
+JavaScript. La parte sulle classi presuppone inoltre una conoscenza basilare
+della programmazione orientata agli oggetti basata su classi (costruttori,
+ereditarietà, overriding, metodi statici, ecc.). La parte sulle <em>promesse</em>,
+infine, presuppone appunto la conoscenza di tale pattern.</p>
+<p>La maggioranza delle funzionalità di ECMAScript 6 possono già essere provate
+sulla maggioranza dei browser (o su <a href="https://nodejs.org/">Node</a>) in ultima
+versione. In alternativa è possibile utilizzare <a href="https://babeljs.io/">Babel</a>.</p>
+<h2 id="indice">Indice</h2>
+<ul>
+<li><a href="#block-scope">Block scope</a></li>
+<li><a href="#template-strings">Template strings</a></li>
+<li><a href="#arrow-functions">Arrow functions</a></li>
+<li><a href="#symbols">Symbols</a></li>
+<li><a href="#iterables">Iterables</a></li>
+<li><a href="#generators">Generators</a></li>
+<li><a href="#arrow-functions">Arrow functions</a></li>
+<li><a href="#classi">Classi</a></li>
+<li><a href="#promesse">Promesse</a></li>
+<li><a href="#miglioramenti-agli-object-literal">Miglioramenti agli object literal</a></li>
+<li><a href="#default-per-i-parametri-di-funzione">Default per i parametri di funzione</a></li>
+<li><a href="#arrow-functions">Arrow functions</a></li>
+<li><a href="#spread-operator">Spread operator</a></li>
+<li><a href="#destructuring">Destructuring</a></li>
+<li><a href="#insiemi-e-mappe">Insiemi e mappe</a></li>
+<li><a href="#moduli">Moduli</a></li>
+</ul>
+<h2 id="block-scope">Block scope</h2>
+<p>Oltre che con <code>var</code> è ora possibile dichiarare variabili con <code>let</code> e <code>const</code>. In
+entrambi i casi si otterrà una variabile visibile solo nel blocco di
+dichiarazione. Nel caso di <code>const</code>, inoltre:</p>
+<ul>
+<li>è obbligatorio inizializzare subito la variabile</li>
+<li>non sarà possibile cambiarne il valore in seguito</li>
+</ul>
+<p>Esempi:</p>
+<pre><code>let x = 7;
+x = 8; // OK
+
+const y; // Errore (non inizializzata)
+
+const z = 9; // OK
+z = 10; // Errore (già inizializzata)
+
+if (false) {
+  let h = 11;
+  const j = 12;
+} else {
+  console.log(h); // Errore (dichiarata in un altro blocco)
+  console.log(j); // Errore (dichiarata in un altro blocco)
+}
+</code></pre><p>Un&#39;ulteriore interessante caratteristica delle variabili <code>let</code> e <code>const</code> e che
+sono immuni
+all&#39;<em><a href="https://developer.mozilla.org/en-US/docs/Glossary/Hoisting=">hoisting</a></em>.</p>
+<p>È bene infine ricordare che assegnare ad una variabile dichiarata con <code>const</code> il
+riferimento ad un oggetto non è affatto sufficiente a rendere tale oggetto
+immutabile:</p>
+<pre><code>const marco = { nome: &#39;Marco&#39; };
+marco.nome = &#39;Mario&#39;;
+</code></pre><h2 id="template-strings">Template strings</h2>
+<p>È possibile definire stringhe utilizzando il carattere ` come delimitatore:</p>
+<pre><code>const nome = `Marco`;
+</code></pre><p>Stringhe definite in questo modo possono essere distribuite su più righe senza
+dover utilizzare continuamente il carattere speciale <code>\n</code>:</p>
+<pre><code>const messaggio = `Tanto
+va la gatta
+al lardo, che
+ci lascia lo
+zampino`;
+</code></pre><p>La peculiarità più importante, però, è la possibilità di <em>interpolare</em> dei
+valori all&#39;interno della stringa:</p>
+<pre><code>const nome = &#39;Marco&#39;;
+const eta = 30;
+const messaggio = `Ciao, mi chiamo ${nome} e ho ${eta} anni`;
+console.log(messaggio); &#39;Ciao, mi chiamo Marco e ho 30 anni&#39;
+</code></pre><h2 id="arrow-functions">Arrow functions</h2>
+<p>Si tratta di una nuova sintassi semplificata per la definizione di funzioni
+anonime. Tale sintassi è in realtà disponibile in diverse varianti:</p>
+<pre><code>[ 1, 2, 3 ].map(x =&gt; 2 * x); // [ 2, 4, 6 ]
+[ 1, 2, 3 ].map((x, i) =&gt; i + &#39;: &#39; + x); // [ &#39;0: 1&#39;, &#39;1: 2&#39;, &#39;2: 3&#39; ]
+[ 1, 2, 3 ].map((x, i) =&gt; {
+  return i + &#39;: &#39; + x;
+}); // [ &#39;0: 1&#39;, &#39;1: 2&#39;, &#39;2: 3&#39; ]
+...
+</code></pre><p>In pratica:</p>
+<ul>
+<li>con più parametri, occorre racchiuderli fra parentesi tonde</li>
+<li>con zero parametri, si usano delle tonde vuote</li>
+<li>nel caso di istruzioni su più righe occorre usare le graffe per delimitare il
+corpo della funzione</li>
+<li>nel caso di funzioni composte da una sola istruzione, il <code>return</code> è implicito</li>
+</ul>
+<p>Da notare inoltre che le funzioni definite in questo modo <em>catturano</em> <code>this</code> dal
+contesto in cui vengono definite, come se fosse una qualunque altra variabile e
+non occorre il classico <code>var self = this;</code>.</p>
+<p><strong>Nota:</strong> Lo stesso vale per la variabile speciale <code>arguments</code>.</p>
+<h2 id="symbols">Symbols</h2>
+<p>La nuova funzione globale <code>Symbol</code> permette di creare valori:</p>
+<ul>
+<li>con garanzia di univocità (<code>Symbol() !== Symbol()</code>)</li>
+<li>con tipo <code>symbol</code> (che entra a far parte dell&#39;insieme dei tipi primitivi di
+JavaScript)</li>
+<li>utilizzabili come chiavi di proprietà</li>
+<li>eventualmente corredati da una stringa descrittiva (<code>Symbol(&#39;pippo&#39;)</code>), che
+però non impatta sull&#39;univocità (<code>Symbol(&#39;pippo&#39;) !== Symbol(&#39;pippo&#39;)</code>)</li>
+</ul>
+<p>Lo scopo è quello di evitare sovrascritture involontarie delle proprietà degli
+oggetti: se usi una stringa rischi di scegliere un nome già utilizzato, mentre
+con i simboli questo non potrà mai succedere.</p>
+<p>Esempio:</p>
+<pre><code>const nome = Symbol(&#39;nome&#39;);
+const marco = {
+  [nome]: &#39;Marco&#39;
+};
+marco[nome] = &#39;Mario&#39;; // OK
+marco.nome = &#39;Mirko&#39;; // OK (ma non è una sovrascrittura, infatti...)
+console.log(marco[nome]); // &#39;Mario&#39;
+const nome2 = Symbol(&#39;nome&#39;);
+marco[nome2] = &#39;Mark&#39;; // OK (ma nemmeno questa è una sovrascrittura...)
+console.log(marco[nome]); // &#39;Mario&#39;
+</code></pre><h2 id="iterables">Iterables</h2>
+<p>È ora possibile iterare su un oggetto sulla base di una logica definita
+dall&#39;oggetto stesso. In particolare:</p>
+<ul>
+<li>l&#39;oggetto deve avere una proprietà con chiave <code>Symbol.iterator</code>, che è un
+simbolo globale predefinito</li>
+<li>il valore di tale proprietà deve essere una funzione</li>
+<li>tale funzione deve a sua volta restituire un oggetto con un metodo <code>next</code></li>
+<li>il metodo <code>next</code> deve restituire oggetti con due proprietà <code>value</code> e <code>done</code>
+che permettono di ottenere il prossimo valore dell&#39;iterazione e di sapere se è
+l&#39;ultimo</li>
+</ul>
+<p>Quando queste condizioni sono rispettate, è possibile usare una variante del
+<code>for</code> che l&#39;interprete JavaScript implementa utilizzando la funzione <code>next</code>
+appena descritta.</p>
+<p>Esempio:</p>
+<pre><code>const numeriCasuali = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        return {
+          value: Math.random(),
+          done: Math.random() &gt; 0.9
+        }
+      }
+    };
+  }
+};
+for (let x of numeriCasuali) {
+  console.log(x);
+}
+</code></pre><p>Alcune note terminologiche:</p>
+<ul>
+<li>oggetti iterabili in questa maniera vengono detti <em>iterable</em></li>
+<li><em>iterator</em> è invece il nome dell&#39;oggetto che implementa il metodo <code>next</code></li>
+</ul>
+<h2 id="generators">Generators</h2>
+<p>Le <em>generator functions</em> (o <em>generators</em>) sono funzioni che:</p>
+<ul>
+<li>sono contrassegnate da un <code>*</code></li>
+<li>possono sospendere temporeaneamente la propria esecuzione tramite parola
+chiave <code>yield</code></li>
+<li>a ogni sospensione, possono &quot;emettere&quot; un valore affiancandolo alla parola
+chiave <code>yield</code>, un po&#39; come una normale funzione può restituire un valore
+tramite parola chiave <code>return</code></li>
+<li>quando vengono invocate non vengono realmente eseguite ma piuttosto
+restituiscono un oggetto iterator</li>
+<li>l&#39;esecuzione effettiva avviene ogni volta che viene invocato il metodo <code>next</code>
+dell&#39;iterator</li>
+<li>a ogni invocazione di <code>next</code>, la proprietà <code>value</code> riporta il valore emesso
+dall&#39;ultimo utilizzo della parola chiave <code>yield</code></li>
+</ul>
+<p>Le generator functions sono il costrutto ideale per la definizione di oggetti
+iterabili:</p>
+<pre><code>const numeriCasuali = {
+  [Symbol.iterator]: function* () {
+    while (Math.random() &lt; 0.9) yield Math.random();
+  }
+};
+for (let x of numeriCasuali) {
+  console.log(x);
+}
+</code></pre><h2 id="classi">Classi</h2>
+<p>ECMAScript 6 introduce la parola chiave <code>class</code> per la creazione di prototipi
+secondo una sintassi simile a quella per le classi negli altri linguaggi di
+programmazione orientati agli oggetti:</p>
+<pre><code>class Persona {
+  constructor(nome) {
+    this.nome = nome;
+  }
+  presentati() {
+    console.log(`Ciao sono ${this.nome}`);
+  }
+}
+
+const marco = new Persona(&#39;Marco&#39;);
+marco.presentati(); // &#39;Ciao sono Marco&#39;
+console.log(marco instanceof Persona); // true
+Persona.prototype.diQualcosa = () =&gt; console.log(&#39;Qualcosa!&#39;);
+marco.diQualcosa(); // &#39;Qualcosa!&#39;
+</code></pre><h3 id="getter-e-setter">Getter e setter</h3>
+<p>Mentre negli altri linguaggi i getter e i setter sono metodi pubblici per
+l&#39;accesso indiretto a membri privati (<em>incapsulamento</em>), in JavaScript sono
+semplicemente dei metodi che possono essere invocati tramite la sintassi
+normalmente utilizzata per l&#39;accesso a proprietà.</p>
+<p>Esempio:</p>
+<pre><code>class Persona {
+  get nome() {
+    console.log(&#39;Accesso in lettura a nome&#39;);
+    return this._nome;
+  }
+  set nome(n) {
+    console.log(&#39;Accesso in scrittura a nome&#39;);
+    this._nome = n;
+  }
+}
+
+const marco = new Persona();
+marco.nome = &#39;Marco&#39;; // &#39;Accesso in scrittura a nome&#39;
+console.log(marco.nome); // &#39;Accesso lettura a nome&#39;, &#39;Marco&#39;
+</code></pre><p><strong>Nota:</strong> Prefissare le variabili d&#39;istanza con un underscore è solo una
+convenzione per indicare che non andrebbero accedute direttamente e non ha alcun
+effetto sulla loro accessibilità (le proprietà di un oggetto JavaScript sono
+sempre accessibili).</p>
+<h3 id="metodi-statici">Metodi statici</h3>
+<p>Esempio:</p>
+<pre><code>class PersoneHelper {
+  static omonimi(p1, p2) {
+    return p1.nome === p2.nome;
+  }
+}
+
+const marco = new Persona(&#39;Marco&#39;);
+const fabio = new Persona(&#39;Fabio&#39;);
+PersoneHelper.omonimi(marco, fabio); // false
+</code></pre><h3 id="ereditariet-e-overriding">Ereditarietà e overriding</h3>
+<p>Esempio:</p>
+<pre><code>class Persona {
+  constructor(nome) {
+    this.nome = nome;
+  }
+  presentati() {
+    console.log(`Ciao sono ${this.nome}`);
+  }
+}
+
+// Ereditarietà
+class Lavoratore extends Persona {
+  constructor(nome, mestiere) {
+    super(nome);
+    this.mestiere = mestiere;
+  }
+  // Overriding
+  presentati() {
+    console.log(`Ciao sono ${this.nome} e sono ${this.mestiere}`);
+  }
+}
+
+const marco = new Lavoratore(&#39;Marco&#39;, &#39;sviluppatore&#39;);
+marco.presentati(); // &#39;Ciao sono Marco e sono sviluppatore&#39;
+console.log(marco instanceof Persona); // true
+console.log(marco instanceof Lavoratore); // true
+</code></pre><h2 id="promesse">Promesse</h2>
+<p>Le promesse sono un modo particolarmente agevole di interagire con API
+asincrone. L&#39;argomento è abbastanza ampio da meritare di essere trattato
+separatamente. Per quanto riguarda questa guida, il punto è che ECMAScript 6
+introduce il suppporto nativo alle promesse tramite il costruttore <code>Promise</code>.</p>
+<p>Esempio:</p>
+<pre><code>// Creazione di promesse
+function miaFunzioneAsincrona() {
+  // L&#39;operazione avrà successo o fallirà randomicamente fra 2 secondi
+  return new Promise((resolve, reject) =&gt; {
+    setTimeout(() =&gt; {
+      if (Math.random() &gt; 0.5) resolve();
+      else reject();
+    }, 2000);
+  });
+}
+
+// Consumo di promesse
+miaFunzioneAsincrona().then(() =&gt; {
+  console.log(&#39;L\&#39;operazione schedulata 2 secondi fa è terminata con successo&#39;);
+}, () =&gt; {
+  console.log(&#39;L\&#39;operazione schedulata 2 secondi fa è fallita&#39;);
+});
+</code></pre><h2 id="miglioramenti-agli-object-literal">Miglioramenti agli object literal</h2>
+<p>In ECMAScript 6 è possibile evitare di ripetere lo stesso identificatore quando
+si assegna ad una proprietà il valore di una variabile con lo stesso nome della
+proprietà:</p>
+<pre><code>const nome = &#39;Marco&#39;;
+const marco = { nome }; // invece di { nome: nome }
+</code></pre><p>È inoltre disponibile una nuova sintassi dedicata ai metodi:</p>
+<pre><code>const nome = &#39;Marco&#39;;
+const marco = {
+  nome,
+  presentati() {
+    console.log(&#39;Ciao sono &#39; + this.nome);
+  }
+};
+</code></pre><p>Infine i nomi delle proprietà possono finalmente essere assegnati dinamicamente:</p>
+<pre><code>const nome = &#39;Marco&#39;;
+const proprieta = &#39;nome&#39;;
+const marco = {
+  [proprieta]: nome
+};
+</code></pre><h2 id="default-per-i-parametri-di-funzione">Default per i parametri di funzione</h2>
+<pre><code>function presentati(nome = &#39;Mario Rossi&#39;) {
+  console.log(&#39;Ciao sono &#39; + nome);
+}
+presentati(); &#39;Ciao sono Mario Rossi&#39;;
+presentati(&#39;Marco&#39;); &#39;Ciao sono Marco&#39;;
+</code></pre><p>È possibile avere più parametri con valori di default, così come è possibile
+mescolare parametri con e senza default. In questi casi la logica di
+assegnazione è più intuitiva di quanto si possa pensare:</p>
+<pre><code>function sommaConDefault(a, b = 1, c, d = 2) {
+  console.log(a, b, c, d);
+  return a + b + c + d;
+}
+sommaConDefault(1); // NaN (1 + 1 + undefined + 2)
+sommaConDefault(1, 2); // NaN (1 + 2 + undefined + 2)
+sommaConDefault(1, undefined, 1); // 5 (1 + 1 + 1 + 2)
+sommaConDefault(1, undefined, 1, 10); // 13 (1 + 1 + 1 + 10)
+</code></pre><h2 id="spread-operator">Spread operator</h2>
+<p>Lo spread operator <code>...</code> consente di trasformare un array in una sequenza di
+valori:</p>
+<p>Esempio:</p>
+<pre><code>let x = [ 3, 4 ];
+let y = [ 7, 8 ];
+console.log([ 1, 2, ...x, 5, 6, ...y ]); // [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+</code></pre><p>Può essere applicato anche a stringhe per ottenere sequenze di caratteri:</p>
+<pre><code>console.log([ ...&#39;ciao&#39; ]); // [ &#39;c&#39;, &#39;i&#39;, &#39;a&#39;, &#39;o&#39; ]
+</code></pre><p>Infine, applicato all&#39;ultimo parametro di una funzione ad N parametri, permette
+di farne un array al quale vengono assegnati tutti gli argomenti dall&#39;N-esimo
+(incluso) in poi:</p>
+<pre><code>function esempio(primo, secondo, ...altri) {
+  console.log(altri);
+}
+esempio(1, 2, 3, 4); // [ 3, 4 ]
+</code></pre><h2 id="destructuring">Destructuring</h2>
+<p>Funzionalità che permette di estrarre porzioni di un oggetto o di un array:</p>
+<pre><code>const { a, b } = { a: &#39;x&#39;, b: &#39;y&#39;, c: &#39;z&#39; };
+console.log(a); // &#39;x&#39;
+console.log(b); // &#39;y&#39;
+
+const [ , a, , , b, ] = [ 4, 8, 15, 16, 23, 42 ];
+console.log(a); // 8
+console.log(b); // 23
+</code></pre><p>È possibile indicare dei valori di default, es.:</p>
+<pre><code>const [ a, b = 2 ] = [ 1 ];
+console.log(a); // 1
+console.log(b); // 2
+</code></pre><p>Il destructuring può essere utilizzato anche nella firma di una funzione per
+estrarre automaticamente porzioni degli argomenti:</p>
+<pre><code>function presentati({ nome }) {
+  console.log(`Ciao sono ${nome}`);
+}
+presentati({ nome: &#39;Marco&#39; }); // Ciao sono Marco
+</code></pre><p>È possibile estrarre proprietà annidate:</p>
+<pre><code>const { indirizzo: { citta } } = {
+  nome: &#39;Marco&#39;,
+  indirizzo: {
+    citta: &#39;Roma&#39;
+  }
+};
+console.log(citta); // &#39;Roma&#39;
+</code></pre><p>È possibile scegliere il nome della variabile che ospiterà il valore estratto:</p>
+<pre><code>const { indirizzo: { citta: cittaDiMarco } } = {
+  nome: &#39;Marco&#39;,
+  indirizzo: {
+    citta: &#39;Roma&#39;
+  }
+};
+console.log(cittaDiMarco); // &#39;Roma&#39;
+</code></pre><h2 id="insiemi-e-mappe">Insiemi e mappe</h2>
+<p>Sono stati introdotti i costruttori <code>Set</code> e <code>Map</code> per la rappresentazione di
+insiemi e mappe:</p>
+<pre><code>const paperi = new Set();
+paperi.add(&#39;Qui&#39;);
+paperi.add(&#39;Qui&#39;);
+paperi.add(&#39;Quo&#39;);
+paperi.add(&#39;Quo&#39;);
+paperi.add(&#39;Qua&#39;);
+paperi.add(&#39;Qua&#39;);
+console.log(paperi.size); // 3
+for (let papero of paperi) console.log(papero);
+
+const coloriSquadre = new Map();
+coloriSquadre.set(&#39;inter&#39;, &#39;nerazzurro&#39;);
+coloriSquadre.set(&#39;roma&#39;, &#39;giallorosso&#39;);
+for (let coppia of coloriSquadre) {
+  const squadra = coppia[0];
+  const colore = coppia[1];
+  // ...
+}
+</code></pre><p>Esistono delle varianti <code>WeakSet</code> e <code>WeakMap</code> che permettono rispettivamente di
+memorizzare oggetti e di usare oggetti come chiavi ma senza influire sulla
+candidatura alla cancellazione di questi oggetti da parte del garbage collector.</p>
+<h2 id="moduli">Moduli</h2>
+<p>In ECMAScript 6 è possibile separare il codice in più moduli, intesi come file
+separati in cui tutte le definizioni sono di default private ma possono essere
+condivise qualora esplicitamente <em>esportate</em> dal file a cui appartengono ed
+<em>importate</em> nel file di destinazione. Allo scopo, sono state introdotte le
+parole chiave <code>import</code> ed <code>export</code>.</p>
+<p>Esempio di esportazione:</p>
+<pre><code>// File &#39;mio-modulo.js&#39;
+export const importantissimoValore = 42;
+</code></pre><p>Esempio di importazione:</p>
+<pre><code>// File &#39;altro-mio-modulo.js&#39; (stessa cartella)
+import { importantissimoValore } from &#39;./mio-modulo.js&#39;;
+
+console.log(importantissimoValore); // 42
+</code></pre><p>Altro esempio di importazione:</p>
+<pre><code>// File &#39;altro-mio-modulo.js&#39; (stessa cartella)
+import * as mioModulo from &#39;./mio-modulo.js&#39;;
+
+console.log(mioModulo.importantissimoValore); // 42
+</code></pre><p><strong>Nota:</strong> Questa seconda sintassi è preferibile quando il numero di definizioni
+da importare è elevato.</p>
+<p><strong>Nota:</strong> Esiste anche altra sintassi dedicata a importazione ed esportazione di
+definizioni, ma trattarle tutte quante servirebbe solo a fare confusione ;)</p>
+    </div>
+  </body>
+</html>

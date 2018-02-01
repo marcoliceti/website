@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ECMAScript 6</title>
+    <link rel="stylesheet" href="guide.css">
+  </head>
+  <body>
+    <div class="guide">
+<h1 id="ecmascript-6">ECMAScript 6</h1>
+<h2 id="abstract">Abstract</h2>
+<p>The purpose of this guide is to present ECMAScript 6 main features in a clear
+and concise way. The focus is on everyday features and that&#39;s why some
+interesting features are skipped altough they can be relevant in library or
+framework development.</p>
+<p>This guide is for developers who already have some JavaScript knowledge. Also,
+it&#39;s assumed basic knowledge of class-based object-oriented programming
+(constructors, inheritance, overriding, static methods, etc.). Finally, in the
+section about <em>promises</em> I assume that you already know this pattern.</p>
+<p>Most ECMAScript 6 features can already be tried out on almost any browser (or
+<a href="https://nodejs.org/">Node</a>), as long as you use recent versions. Alternatively,
+you can use <a href="https://babeljs.io/">Babel</a>.</p>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#block-scope">Block scope</a></li>
+<li><a href="#template-strings">Template strings</a></li>
+<li><a href="#arrow-functions">Arrow functions</a></li>
+<li><a href="#symbols">Symbols</a></li>
+<li><a href="#iterables">Iterables</a></li>
+<li><a href="#generators">Generators</a></li>
+<li><a href="#arrow-functions">Arrow functions</a></li>
+<li><a href="#classes">Classes</a></li>
+<li><a href="#promises">Promises</a></li>
+<li><a href="#object-literal-enhancements">Object literal enhancements</a></li>
+<li><a href="#default-parameters">Default parameters</a></li>
+<li><a href="#arrow-functions">Arrow functions</a></li>
+<li><a href="#spread-operator">Spread operator</a></li>
+<li><a href="#destructuring">Destructuring</a></li>
+<li><a href="#sets-and-maps">Sets and maps</a></li>
+<li><a href="#modules">Modules</a></li>
+</ul>
+<h2 id="block-scope">Block scope</h2>
+<p>It&#39;s now possible to have block scoped variables by using the <code>let</code> and <code>const</code>
+instead of the clasic <code>var</code>. Also, <code>const</code> variables:</p>
+<ul>
+<li>must be initialized</li>
+<li>can&#39;t be reassigned</li>
+</ul>
+<p>Examples:</p>
+<pre><code>let x = 7;
+x = 8; // OK
+
+const y; // Error (not initialized)
+
+const z = 9; // OK
+z = 10; // Error (can&#39;t reassign)
+
+if (false) {
+  let h = 11;
+  const j = 12;
+} else {
+  console.log(h); // Error (declared in another block)
+  console.log(j); // Error (declared in another block)
+}
+</code></pre><p><code>let</code> and <code>const</code> are immune to
+<em><a href="https://developer.mozilla.org/en-US/docs/Glossary/Hoisting=">hoisting</a></em>.</p>
+<p>Finally, keep in mind that assigning to an object to a <code>const</code> variable doesn&#39;t
+magically make it immutable:</p>
+<pre><code>const marco = { name: &#39;Marco&#39; };
+marco.name = &#39;Mario&#39;;
+</code></pre><h2 id="template-strings">Template strings</h2>
+<p>The character ` is a new delimiter for string literals:</p>
+<pre><code>const nome = `Marco`;
+</code></pre><p>This kind of string literal allows for multi-line strings without always
+appending <code>\n</code>:</p>
+<pre><code>const message = `I see trees of green, red roses too
+I see them bloom for me and you
+And I think to myself what a wonderful world`;
+</code></pre><p>The main advantage of this new syntax, though, is the ability to <em>interpolate</em>
+values inside the string:</p>
+<pre><code>const name = &#39;Marco&#39;;
+const age = 30;
+const message = `Hi I&#39;m ${name} and I&#39;m ${age}`;
+console.log(message); &#39;Hi I&#39;m ${name} and I&#39;m ${age}&#39;
+</code></pre><h2 id="arrow-functions">Arrow functions</h2>
+<p>It&#39;s a simplified syntax for anonymous functions that comes in many variants:</p>
+<pre><code>[ 1, 2, 3 ].map(x =&gt; 2 * x); // [ 2, 4, 6 ]
+[ 1, 2, 3 ].map((x, i) =&gt; i + &#39;: &#39; + x); // [ &#39;0: 1&#39;, &#39;1: 2&#39;, &#39;2: 3&#39; ]
+[ 1, 2, 3 ].map((x, i) =&gt; {
+  return i + &#39;: &#39; + x;
+}); // [ &#39;0: 1&#39;, &#39;1: 2&#39;, &#39;2: 3&#39; ]
+...
+</code></pre><p>In short:</p>
+<ul>
+<li>if you have more than one paramether, use round brackets</li>
+<li>if you have no paramethers, use <em>empty</em> round brackets</li>
+<li>if you have multiple statements, use curly brackets</li>
+<li>if you have only statement, <code>return</code> is implied</li>
+</ul>
+<p>Note that arrow functions <em>capture</em> <code>this</code>, treating it like any variable
+declared with <code>var</code>. So, no neeed for tricks like <code>var self = this;</code>.</p>
+<p><strong>Note:</strong> The same goes for the special variable <code>arguments</code>.</p>
+<h2 id="symbols">Symbols</h2>
+<p>It&#39;s a new global function that allows to create values that:</p>
+<ul>
+<li>are unique (<code>Symbol() !== Symbol()</code>)</li>
+<li>have type <code>symbol</code> (which is now a new JavaScript primitive type)</li>
+<li>can be used as keys for object properties</li>
+<li>can have a descriptive string (<code>Symbol(&#39;foo&#39;)</code>), but this doesn&#39;t affect
+uniqueness (<code>Symbol(&#39;foo&#39;) !== Symbol(&#39;foo&#39;)</code>)</li>
+</ul>
+<p>The goal is to avoid undesired overwriting of object properties:</p>
+<pre><code>const name = Symbol(&#39;name&#39;);
+const marco = {
+  [name]: &#39;Marco&#39;
+};
+marco[name] = &#39;Mario&#39;; // OK
+marco.name = &#39;Mirko&#39;; // OK (but it&#39;s not an overwrite)
+console.log(marco[name]); // &#39;Mario&#39;
+const name2 = Symbol(&#39;name&#39;);
+marco[name2] = &#39;Mark&#39;; // OK (but it&#39;s not an overwrite)
+console.log(marco[name]); // &#39;Mario&#39;
+</code></pre><h2 id="iterables">Iterables</h2>
+<p>You can now iterate over an object following a custom iteration logic.
+Specifically:</p>
+<ul>
+<li>the object needs to have a property with a <code>Symbol.iterator</code> key, which is a
+predefined global symbol</li>
+<li>the value of this property should be a function</li>
+<li>this function should return an object with a <code>next</code> method</li>
+<li>this method should return objects with a <code>value</code> and a <code>next</code> properties in
+order to provide the next value and signal iteration termination</li>
+</ul>
+<p>When these conditions are met, you can use a brand new <code>for</code> syntax that the
+JavaScript interpreter implements by calling the <code>next</code> method for you:</p>
+<pre><code>const randomNumbers = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        return {
+          value: Math.random(),
+          done: Math.random() &gt; 0.9
+        }
+      }
+    };
+  }
+};
+for (let x of randomNumbers) {
+  console.log(x);
+}
+</code></pre><p>Some terminology:</p>
+<ul>
+<li>objects that are iterable in this fashion are called... <em>iterables</em></li>
+<li>the object with the <code>next</code> method is called an <em>iterator</em></li>
+</ul>
+<h2 id="generators">Generators</h2>
+<p>Generators (or generator functions) are functions that:</p>
+<ul>
+<li>have a <code>*</code> after the <code>function</code> keyword</li>
+<li>can temporarily suspend their execution by using the <code>yield</code> keyword</li>
+<li>when they suspend, they can emit a value (using <code>yield</code> just like <code>return</code>)</li>
+<li>when they are invoked, they actually <em>don&#39;t</em> get executed, and an iterable is
+returned instead</li>
+<li>this iterable provides access to the values that the generator function emits</li>
+<li>actual execution happens when the <code>next</code> method of the iterator is called and
+goes on until <code>return</code> or <code>yield</code> are used</li>
+</ul>
+<p>Generator functions are the ideal way of implementing iterators:</p>
+<pre><code>const randomNumbers = {
+  [Symbol.iterator]: function* () {
+    while (Math.random() &lt; 0.9) yield Math.random();
+  }
+};
+for (let x of randomNumbers) {
+  console.log(x);
+}
+</code></pre><h2 id="classes">Classes</h2>
+<p>ECMAScript 6 introduces the <code>class</code> keyword which enables easier prototype
+definition through a syntax that looks like class definitions in class-based
+object-oriented languages:</p>
+<pre><code>class Person {
+  constructor(name) {
+    this.name = name;
+  }
+  sayHi() {
+    console.log(`Hi I&#39;m ${this.name}`);
+  }
+}
+
+const marco = new Person(&#39;Marco&#39;);
+marco.sayHi(); // &#39;Hi I&#39;m Marco&#39;
+console.log(marco instanceof Person); // true
+Person.prototype.saySomething = () =&gt; console.log(&#39;Something!&#39;);
+marco.saySomething(); // &#39;Something!&#39;
+</code></pre><h3 id="getters-and-setters">Getters and setters</h3>
+<p>While in other languages getters and setters provide access to otherwise private
+members (<em>encapsulation</em>), ECMAScript 6 getters and setters are meant to
+customize property reads / writes:</p>
+<pre><code>class Person {
+  get nome() {
+    console.log(&#39;Reading name&#39;);
+    return this._nome;
+  }
+  set nome(n) {
+    console.log(&#39;Writing name&#39;);
+    this._nome = n;
+  }
+}
+
+const marco = new Person();
+marco.name = &#39;Marco&#39;; // &#39;Writing name&#39;
+console.log(marco.name); // &#39;Reading name&#39;, &#39;Marco&#39;
+</code></pre><p><strong>Note:</strong> Prefixing variables with an underscore doesn&#39;t magically make them
+private. It&#39;s just a convention to tell that they shouldn&#39;t be accessed
+directly. Remember: <em>JavaScript object properties are always public</em>.</p>
+<h3 id="static-methods">Static methods</h3>
+<p>Example:</p>
+<pre><code>class PeopleHelper {
+  static sameName(p1, p2) {
+    return p1.name === p2.name;
+  }
+}
+
+const marco = new Person(&#39;Marco&#39;);
+const fabio = new Person(&#39;Fabio&#39;);
+PeopleHelper.sameName(marco, fabio); // false
+</code></pre><h3 id="inheritance-and-overriding">Inheritance and overriding</h3>
+<p>Example:</p>
+<pre><code>class Person {
+  constructor(nome) {
+    this.nome = nome;
+  }
+  presentati() {
+    console.log(`Ciao sono ${this.nome}`);
+  }
+}
+
+// Inheritance
+class Athlete extends Person {
+  constructor(name, sport) {
+    super(name);
+    this.sport = sport;
+  }
+  // Overriding
+  sayHi() {
+    console.log(`Hi I&#39;m ${this.name} and I play ${this.sport}`);
+  }
+}
+
+const marco = new Athlete(&#39;Marco&#39;, &#39;soccer&#39;);
+marco.sayHi(); // &#39;Hi I&#39;m Marco and I play soccer&#39;
+console.log(marco instanceof Person); // true
+console.log(marco instanceof Athlete); // true
+</code></pre><h2 id="promises">Promises</h2>
+<p>Promises are essentially a convenient way of dealing with asynchronous tasks.
+I won&#39;t discuss promises here, since it&#39;s a topic that should be treated
+individually. As for this guide, the thing you should know is that ECMAScript 6
+brings native support for promises through the <code>Promise</code> constructor:</p>
+<pre><code>// Creating promises
+function myAsyncTask() {
+  // Will randomly fail / succeed 2 seconds from now
+  return new Promise((resolve, reject) =&gt; {
+    setTimeout(() =&gt; {
+      if (Math.random() &gt; 0.5) resolve();
+      else reject();
+    }, 2000);
+  });
+}
+
+// Consuming promises
+myAsyncTask().then(() =&gt; {
+  console.log(&#39;Task completed successfully&#39;);
+}, () =&gt; {
+  console.log(&#39;Failure&#39;);
+});
+</code></pre><h2 id="object-literal-enhancements">Object literal enhancements</h2>
+<p>You can now avoid to repeat the same identifier when using a variable as a value
+for a property:</p>
+<pre><code>const name = &#39;Marco&#39;;
+const marco = { name }; // instead of { name: name }
+</code></pre><p>It&#39;s available a new syntax for methods:</p>
+<pre><code>const name = &#39;Marco&#39;;
+const marco = {
+  name,
+  sayHi() {
+    console.log(`Hi I&#39;m ${this.name}`);
+  }
+};
+</code></pre><p>Property names may be dynamically assigned:</p>
+<pre><code>const name = &#39;Marco&#39;;
+const property = &#39;name&#39;;
+const marco = {
+  [property]: name
+};
+</code></pre><h2 id="default-parameters">Default parameters</h2>
+<pre><code>function sayHi(name = &#39;John Doe&#39;) {
+  console.log(`Hi I&#39;m ${this.name}`);
+}
+sayHi(); &#39;Hi I&#39;m John Doe&#39;;
+sayHi(&#39;Marco&#39;); &#39;Hi I&#39;m Marco&#39;;
+</code></pre><p>You can have multiple default parameters, and you can even mix them with regular
+parameters:</p>
+<pre><code>function sumWithDefaultParameters(a, b = 1, c, d = 2) {
+  console.log(a, b, c, d);
+  return a + b + c + d;
+}
+sumWithDefaultParameters(1); // NaN (1 + 1 + undefined + 2)
+sumWithDefaultParameters(1, 2); // NaN (1 + 2 + undefined + 2)
+sumWithDefaultParameters(1, undefined, 1); // 5 (1 + 1 + 1 + 2)
+sumWithDefaultParameters(1, undefined, 1, 10); // 13 (1 + 1 + 1 + 10)
+</code></pre><h2 id="spread-operator">Spread operator</h2>
+<p>The spread operator <code>...</code> turns an array into a sequence of values:</p>
+<pre><code>let x = [ 3, 4 ];
+let y = [ 7, 8 ];
+console.log([ 1, 2, ...x, 5, 6, ...y ]); // [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+</code></pre><p>When applied to a string, the output is an array of individual characters:</p>
+<pre><code>console.log([ ...&#39;hello&#39; ]); // [ &#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39; ]
+</code></pre><p>Finally, when a function has N parameters if you apply the spread operator to
+the last one, it will store all the arguments after the N-th one (included):</p>
+<pre><code>function example(first, second, ...etc) {
+  console.log(etc);
+}
+example(1, 2, 3, 4); // [ 3, 4 ]
+</code></pre><h2 id="destructuring">Destructuring</h2>
+<p>It&#39;s a feature that allows to extract pieces of an object or array:</p>
+<pre><code>const { a, b } = { a: &#39;x&#39;, b: &#39;y&#39;, c: &#39;z&#39; };
+console.log(a); // &#39;x&#39;
+console.log(b); // &#39;y&#39;
+
+const [ , a, , , b, ] = [ 4, 8, 15, 16, 23, 42 ];
+console.log(a); // 8
+console.log(b); // 23
+</code></pre><p>You can provide default values:</p>
+<pre><code>const [ a, b = 2 ] = [ 1 ];
+console.log(a); // 1
+console.log(b); // 2
+</code></pre><p>It can be used in function signatures to automatically extract pieces of an
+argument:</p>
+<pre><code>function sayHi({ name }) {
+  console.log(`Hi I&#39;m ${this.name}`);
+}
+sayHi({ name: &#39;Marco&#39; }); // Hi I&#39;m Marco
+</code></pre><p>It&#39;s even possible to extract nested properties:</p>
+<pre><code>const { address: { city } } = {
+  name: &#39;Marco&#39;,
+  address: {
+    city: &#39;Rome&#39;
+  }
+};
+console.log(city); // &#39;Rome&#39;
+</code></pre><p>...and you can choose a custom name:</p>
+<pre><code>const { address: { city: cityOfMarco } } = {
+  name: &#39;Marco&#39;,
+  address: {
+    city: &#39;Rome&#39;
+  }
+};
+console.log(cityOfMarco); // &#39;Rome&#39;
+</code></pre><h2 id="sets-and-maps">Sets and maps</h2>
+<p>New classes for sets and maps:</p>
+<pre><code>const stuff = new Set();
+stuff.add(&#39;foo&#39;);
+stuff.add(&#39;foo&#39;);
+stuff.add(&#39;bar&#39;);
+stuff.add(&#39;bar&#39;);
+stuff.add(&#39;baz&#39;);
+stuff.add(&#39;baz&#39;);
+console.log(stuff.size); // 3
+for (let thing of stuff) console.log(thing);
+
+const presidents = new Map();
+presidents.set(&#39;usa&#39;, &#39;Trump&#39;);
+presidents.set(&#39;france&#39;, &#39;Macron&#39;);
+for (let entry of presidents) {
+  const country = entry[0];
+  const president = entry[1];
+  // ...
+}
+</code></pre><p>There are also <code>WeakSet</code> e <code>WeakMap</code> variants. Elements of a weak set can be
+garbage collected even when still referenced, as long as the only references
+are the ones from the set itself. The same applies to keys of a weak map.</p>
+<h2 id="modules">Modules</h2>
+<p>You can separate your code into different modules with private definitions that
+must be shared explicitly with the <code>import</code> ed <code>export</code> keywords.</p>
+<p>Export example:</p>
+<pre><code>// File &#39;my-module.js&#39;
+export const importantValue = 42;
+</code></pre><p>Import example:</p>
+<pre><code>// File &#39;other-module.js&#39; (same folder)
+import { importantValue } from &#39;./my-module.js&#39;;
+
+console.log(importantValue); // 42
+</code></pre><p>Import example (alternative syntax):</p>
+<pre><code>// File &#39;other-module.js&#39; (same folder)
+import * as myModule from &#39;./my-module.js&#39;;
+
+console.log(myModule.importantValue); // 42
+</code></pre><p><strong>Note:</strong> This is syntax is preferable when importing a lot of definitions.</p>
+<p><strong>Note:</strong> There&#39;s a lot of additional syntax for modules but this is enough.
+More details would just bring confusion ;)</p>
+    </div>
+  </body>
+</html>

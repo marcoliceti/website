@@ -16,34 +16,40 @@
 }
 
 body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
   font-family: open-sans;
-  margin: 20vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
 }
 
-.site_title {
-  margin-bottom: 2vh;
-  font-weight: bold;
+h1 {
+  margin: 0;
+  color: rgb(192, 192, 192);
 }
 
-.site_content {
+h2 {
+  margin: 0;
+  color: rgb(127, 127, 127);
+}
+
+ul {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  list-style: none;
+  padding: 0;
 }
 
-.site_content .item {
-  margin-top: 2vh;
-  margin-bottom: 2vh;
-}
-
-.site_content .item a {
-  display: block;
-  width: 25vw;
-  color: rgba(0, 0, 0, 0.75);
+li {
+  margin: 1vh;
+  padding: 1vh;
+  background: rgb(236, 236, 236);
   text-align: center;
-  text-transform: lowercase;
+}
+
+a {
+  color: rgb(127, 127, 127);
+  text-decoration: none;
 }
