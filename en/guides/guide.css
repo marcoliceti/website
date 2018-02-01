@@ -39,7 +39,7 @@ body {
 
 @media screen and (orientation: portrait) {
   .guide, #disqus_thread {
-    max-width: 80vw;
+    width: 80vw;
   }
 }
 
