@@ -42,12 +42,6 @@ p {
   text-align: justify;
 }
 
-em {
-  font-style: normal;
-  font-weight: bold;
-  color: rgb(127, 127, 127);
-}
-
 code {
   background: rgba(244, 244, 244, 0.75);
   color: rgb(64, 64, 64);
@@ -71,7 +65,6 @@ pre > code {
 a {
   color: rgb(0, 150, 136);
   text-decoration: none;
-  font-weight: bold;
 }
 
 #disqus_thread {
