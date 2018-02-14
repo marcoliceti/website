@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-113403078-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113403078-1');
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TypeScript</title>
+    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+  </head>
+  <body>
+    <div class="guida">
+<h1 id="typescript">TypeScript</h1>
+<h2 id="sommario">Sommario</h2>
+<p>TypeScript è un linguaggio progettato da Microsoft per fornire agli sviluppatori
+JavaScript controlli automatici (e suggerimenti automatici) durante la scrittura
+del codice e senza richiederne l&#39;esecuzione (analisi statica). Tali feature si
+basano soprattutto sulla dichiarazione dei tipi delle variabili e sulla
+definizione di classi di oggetti.</p>
+<p>TypeScript ha inoltre l&#39;obiettivo di anticipare il supporto alle feature
+definite nelle revisioni più recenti di JavaScript.</p>
+<p>In questa guida presenterò brevemente TypeScript (versione 2) dando per noti i
+concetti base della programmazione orientatata agli oggetti basata su classi
+(interfacce, incapsulamento, erediterietà, polimorfismo, overriding, membri
+statici). Prima di proseguire, può essere utile leggere anche la guida che ho
+scritto su <a href="http://marcoliceti.xyz/it/guide/ecma-script-6.html">ECMAScript 6</a>,
+visto che tali feature non saranno rispiegate in questa guida.</p>
+<p>Il codice TypeScript va compilato (o meglio:
+<a href="https://en.wikipedia.org/wiki/Source-to-source_compiler">&quot;transpilato&quot;</a>) in
+codice JavaScript, perciò gli esempi in questa guida possono essere eseguiti su
+browser (o su <a href="https://nodejs.org">Node</a>) a patto di effettuarne appunto la
+compilazione. A tale scopo è possibile utilizzare il <a href="https://www.typescriptlang.org">compilatore ufficiale di
+Microsoft</a>. In alternativa è possibile usare
+<a href="https://www.typescriptlang.org/play/index.html">questo compilatore online</a>
+ufficiale. Per un utilizzo più serio, è invece consigliabile <a href="https://code.visualstudio.com/">Visual Studio
+Code</a> o altro IDE.</p>
+<h2 id="indice">Indice</h2>
+<ul>
+<li><a href="#tipi-semplici-e-dichiarazione-di-variabili">Tipi semplici e dichiarazione di variabili</a></li>
+<li><a href="#array-e-tuple">Array e tuple</a></li>
+<li><a href="#funzioni">Funzioni</a></li>
+<li><a href="#interfacce">Interfacce</a></li>
+<li><a href="#type-assertion">Type assertion</a></li>
+<li><a href="#classi">Classi</a></li>
+<li><a href="#implementazione-di-interfacce">Implementazione di interfacce</a></li>
+<li><a href="#incapsulamento">Incapsulamento</a></li>
+<li><a href="#membri-statici">Membri statici</a></li>
+<li><a href="#ereditarieta-e-polimorfismo">Ereditarietà e polimorfirmo</a></li>
+<li><a href="#overriding">Overriding</a></li>
+<li><a href="#classi-astratte">Classi astratte</a></li>
+<li><a href="#generics">Generics</a></li>
+</ul>
+<h2 id="tipi-semplici-e-dichiarazione-di-variabili">Tipi semplici e dichiarazione di variabili</h2>
+<p>I tipi semplici di uso più comune sono:</p>
+<ul>
+<li>boolean</li>
+<li>number</li>
+<li>string</li>
+<li>void (può assumere solo i valori <code>null</code> e <code>undefined</code>)</li>
+<li>any (può assumere qualunque valore)</li>
+</ul>
+<p>Esempi:</p>
+<pre><code>let n: number = 7; // OK
+let s: string = &#39;ciao&#39;; // OK
+let b: boolean = true; // OK
+let x: void = null; // OK
+let y: any = &#39;va bene qualunque valore&#39;; // OK
+
+n = &#39;7&#39;; // Errore (string assegnata a number)
+s = 42; // Errore (number assegnato a string)
+b = &#39;true&#39;; // Errore (string assegnata a boolean)
+x = &#39;ciao&#39;; // Errore (assegnato valore non null e non undefined)
+</code></pre><p>Per le variabili inizializzate a tempo di dichiarazione è possibile omettere il
+tipo, che verrà inferito dal compilatore:</p>
+<pre><code>let n = 7; (inferito tipo number)
+n = &#39;ciao&#39;; // Errore (string assegnata a number)
+</code></pre><p><strong>Nota:</strong> Per le variabili non inizializzate, in assenza di dichiarazione
+esplicita, viene assegnato tipo <code>any</code>.</p>
+<h2 id="array-e-tuple">Array e tuple</h2>
+<p>Una sintassi possibile è quella utilizzata nel seguente esempio:</p>
+<pre><code>let n: number[];
+</code></pre><p>In alternativa:</p>
+<pre><code>let n: Array&lt;number&gt;;
+</code></pre><p>In entrambi i casi, ovviamente, l&#39;array potrà contenere solo elementi del tipo
+specificato:</p>
+<pre><code>let n: number[];
+n = [ 1, 2, 3 ]; // OK
+n = [ &#39;1&#39;, &#39;2&#39;, &#39;3&#39; ]; // Errore
+</code></pre><p>Se si desidera memorizzare valori di tipi disomogenei (come possibile in
+JavaScript tradizionale) si possono utilizzare le tuple:</p>
+<pre><code>let voto: [ string, number ];
+voto = [ &#39;informatica&#39;, 10 ]; // OK
+voto = [ &#39;informatica&#39;, &#39;10&#39; ]; // Errore
+</code></pre><p>Anche per gli array è supportata l&#39;inferenza dei tipi:</p>
+<pre><code>let n = [ 1, 2, 3 ]; // tipo inferito: number[]
+</code></pre><h2 id="funzioni">Funzioni</h2>
+<p>È possibile specificare il tipo dei parametri e del valore di ritorno:</p>
+<pre><code>function somma(a: number, b: number): number {
+  return a + b;
+}
+somma(2, 2); // 4
+somma(&#39;2&#39;, &#39;2&#39;); // Errore
+</code></pre><p>In molti casi risulta comodo e corretto omettere il tipo di ritorno, accettando
+implicitamente quello inferito da TypeScript:</p>
+<pre><code>function somma(a: number, b: number) {
+  return a + b; // tipo inferito: number
+}
+let s: string = somma(2, 2); // Errore (assegnato number a string)
+</code></pre><h2 id="interfacce">Interfacce</h2>
+<p>Definiscono tipi di oggetto in termini di proprietà previste:</p>
+<pre><code>interface Persona {
+  nome: string;
+  eta: number;
+}
+</code></pre><p>Le proprietà possono anche essere metodi e in tal caso la sintassi è simile a
+quella con cui si dichiarano le funzioni:</p>
+<pre><code>interface Calcolatrice {
+  somma(a: number, b: number): number;
+  prodotto(a: number, b: number): number;
+  ...
+}
+</code></pre><p>Le proprietà dichiarate in un&#39;interfaccia sono intese come obbligatorie:</p>
+<pre><code>interface Persona {
+  nome: string;
+  eta: number;
+}
+const marco: Persona = { nome: &#39;Marco&#39;, eta: 30 }; // OK
+const anonimo: Persona = { eta: 33 }; // Errore (manca il nome)
+</code></pre><p>È però possibile marcarle come opzionali:</p>
+<pre><code>interface Persona {
+  nome?: string;
+  eta: number;
+}
+const marco: Persona = { nome: &#39;Marco&#39;, eta: 30 }; // OK
+const anonimo: Persona = { eta: 33 }; // OK
+</code></pre><p>Non è possibile utilizzare proprietà diverse da quelle previste:</p>
+<pre><code>interface Persona {
+  nome: string;
+  eta: number;
+}
+let marco: Persona = { nome: &#39;Marco&#39;, eta: 30 }; // OK
+marco = { nome: &#39;Marco&#39;, eta: 30, professione: &#39;sviluppatore&#39; }; // Errore
+</code></pre><h2 id="type-assertion">Type assertion</h2>
+<p>Permettono di trattare una variabile come se avesse un certo tipo, diverso da
+quello effettivo.</p>
+<p>Esempio:</p>
+<pre><code>interface Persona {
+  nome: string;
+}
+
+interface Lavoratore {
+  nome: string;
+  mestiere: string;
+}
+
+const marco: Persona = { nome: &#39;Marco&#39; };
+marco.mestiere = &#39;Sviluppatore&#39;; // Errore
+(marco as Lavoratore).mestiere = &#39;Sviluppatore&#39;; // OK
+</code></pre><p>Esiste anche una sintassi alternativa:</p>
+<pre><code>(&lt;Lavoratore&gt;marco).mestiere = &#39;Sviluppatore&#39;;
+</code></pre><h2 id="classi">Classi</h2>
+<p>È possibile definire classi e dichiarare le loro variabili d&#39;istanza utilizzando
+la stessa sintassi valida per le interfacce:</p>
+<pre><code>class Persona {
+  nome: string;
+}
+const marco = new Persona();
+marco.nome = &#39;Marco&#39;; // OK
+marco.mestiere = &#39;Sviluppatore&#39;; // Errore
+</code></pre><p>È possibile definire un costruttore personalizzato:</p>
+<pre><code>class Persona {
+  nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+}
+const marco = new Persona(&#39;Marco&#39;);
+console.log(marco.nome); // &#39;Marco&#39;
+</code></pre><p>È possibile definire uno o più metodi d&#39;istanza:</p>
+<pre><code>class Persona {
+  nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+
+  creaSaluto(): string {
+    return `Ciao sono ${this.nome}`;
+  }
+}
+
+const marco = new Persona(&#39;Marco&#39;);
+const saluto = marco.creaSaluto();
+console.log(saluto); // &#39;Ciao sono Marco&#39;
+</code></pre><p>Una volta compilato il codice TypeScript, una classe viene tradotta in una
+funzione da usare come costruttore. Ad esempio la seguente classe:</p>
+<pre><code>class Persona {
+  nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+}
+const marco = new Persona(&#39;Marco&#39;);
+</code></pre><p>...viene tradotta in qualcosa di simile a:</p>
+<pre><code>function Persona(nome) {
+  this.nome = nome;
+}
+var marco = new Persona(&#39;Marco&#39;);
+</code></pre><h2 id="implementazione-di-interfacce">Implementazione di interfacce</h2>
+<p>La classe implementante deve contenere le proprietà dichiarate nell&#39;interfaccia:</p>
+<pre><code>interface AventeNome {
+  nome: string;
+}
+
+interface Chiaccherone {
+  diQualcosa(cosa: string);
+}
+
+class Persona implements AventeNome, Chiaccherone {
+  nome: string;
+
+  diQualcosa(cosa: string) {
+    console.log(qualcosa);
+  }
+}
+</code></pre><h2 id="incapsulamento">Incapsulamento</h2>
+<pre><code>class Persona {
+  private nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+}
+
+const marco = new Persona(&#39;Marco&#39;);
+console.log(marco.nome); // Errore (variabile privata)
+</code></pre><p>Oltre a variabili d&#39;istanza <code>private</code> è possibile dichiarare variabili d&#39;istanza
+<code>protected</code>, il che permette di accederle dall&#39;interno di una
+<a href="#ereditarieta">sottoclasse</a>.</p>
+<p>Anche i metodi possono essere oggetto di incapsulamento:</p>
+<pre><code>class Esempio {
+  private metodoPrivato() {
+    console.log(&#39;OK&#39;);
+  }
+
+  metodoPubblico() {
+    this.metodoPrivato();
+  }
+}
+
+const esempio = new Esempio();
+esempio.metodoPrivato(); // Errore (metodo privato)
+esempio.metodoPubblico(); // &#39;OK&#39;
+</code></pre><p>Sono infine supportate anche variabili d&#39;istanza <code>readonly</code>, che possono essere
+oggetto di assegnazione solo all&#39;interno del costruttore:</p>
+<pre><code>class Persona {
+  readonly nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+
+  cambiaNome(nuovoNome: string) {
+    this.nome = nuovoNome; // Errore
+  }
+}
+
+const marco = new Persona(&#39;Marco&#39;);
+console.log(marco.nome); // &#39;Marco&#39;;
+marco.nome = &#39;Mario&#39;; // Errore
+</code></pre><h2 id="membri-statici">Membri statici</h2>
+<p>Sono proprietà che invece di essere associate alle istanze della classe sono
+associate alla classe stessa. A livello di codice JavaScript risultante, i
+membri statici vengono assegnati alla funzione ottenuta a seguito della
+transpilazione.</p>
+<p>Per esempio il seguente codice TypeScript:</p>
+<pre><code>class Contatore {
+  static n: number;
+
+  static inizializza() {
+    Contatore.n = 0;
+  }
+}
+</code></pre><p>...viene tradotto in codice JavaScript simile al seguente:</p>
+<pre><code>function Contatore() {}
+Contatore.inizializza = function () {
+  Contatore.n = 0;
+};
+</code></pre><h2 id="ereditariet-e-polimorfismo">Ereditarietà e polimorfismo</h2>
+<pre><code>class Persona {
+  protected nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+
+  getNome() {
+    return this.nome;
+  }
+}
+
+class Lavoratore extends Persona {
+  protected mestiere: string;
+
+  constructor(nome: string, mestiere: string) {
+    super(nome);
+    this.mestiere = mestiere;
+  }
+
+  getNomeEMestiere() {
+    return `${this.nome} ${this.mestiere}`;
+  }
+}
+
+const marco: Persona = new Lavoratore(&#39;Marco&#39;, &#39;Sviluppatore&#39;);
+marco.getNome(); // &#39;Marco&#39;
+marco.getNomeEMestiere(); // Errore
+(marco as Lavoratore).getNomeEMestiere(); // &#39;Marco Sviluppatore&#39;
+</code></pre><h2 id="overriding">Overriding</h2>
+<pre><code>class Persona {
+  protected nome: string;
+
+  constructor(nome: string) {
+    this.nome = nome;
+  }
+
+  presentati() {
+    return `Ciao sono ${this.nome}`;
+  }
+}
+
+class Lavoratore extends Persona {
+  protected mestiere: string;
+
+  constructor(nome: string, mestiere: string) {
+    super(nome);
+    this.mestiere = mestiere;
+  }
+
+  presentati() {
+    return `Ciao sono ${this.nome} e sono ${this.mestiere}`;
+  }
+}
+
+const marcoPersona = new Persona(&#39;Marco&#39;);
+const marcoLavoratore = new Lavoratore(&#39;Marco&#39;, &#39;Sviluppatore&#39;);
+marcoPersona.presentati(); // &#39;Ciao sono Marco&#39;
+marcoLavoratore.presentati(); // &#39;Ciao sono Marco e sono Sviluppatore&#39;
+</code></pre><h2 id="classi-astratte">Classi astratte</h2>
+<pre><code>abstract class FiguraPiana {
+  abstract area(): number;
+}
+
+class Quadrato extends FiguraPiana {
+  lato: number;
+
+  constructor(lato: number) {
+    super();
+    this.lato = lato;
+  }
+
+  area() {
+    return this.lato * this.lato;
+  }
+}
+
+const quadrato: FiguraPiana = new Quadrato(8);
+quadrato.area(); // 64
+</code></pre><h2 id="generics">Generics</h2>
+<p>Sono supportate funzioni generiche:</p>
+<pre><code>function identita&lt;T&gt;(x: T): T {
+  return x;
+}
+
+identita&lt;number&gt;(7); // 7
+identita&lt;number&gt;(&#39;7&#39;); // Errore
+identita&lt;string&gt;(&#39;7&#39;); // &#39;7&#39;
+identita(&#39;7&#39;); // &#39;7&#39; (tipo inferito)
+</code></pre><p>...e classi generiche:</p>
+<pre><code>class CalcolatoreIdentita&lt;T&gt; {
+  calcola(x: T): T {
+    return x;
+  }
+}
+
+const identitaNumeri = new CalcolatoreIdentita&lt;number&gt;();
+identitaNumeri.calcola(7); // 7
+identitaNumeri.calcola(&#39;7&#39;); // Errore
+
+const identitaStringhe = new CalcolatoreIdentita&lt;string&gt;();
+identitaStringhe.calcola(7); // Errore
+identitaStringhe.calcola(&#39;7&#39;); // &#39;7&#39;
+</code></pre>
+    </div>
+    <div id="disqus_thread"></div>
+    <script>
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://marcoliceti-xyz.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

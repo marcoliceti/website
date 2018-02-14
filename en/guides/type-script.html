@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-113403078-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113403078-1');
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TypeScript</title>
+    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+  </head>
+  <body>
+    <div class="guide">
+<h1>TypeScript</h1>
+<h2 id="abstract">Abstract</h2>
+<p>TypeScript is a language designed by Microsoft in order to provide JavaScript
+developers with some automatic error checking (and code suggestions) at
+implementation time, without the need for running the code (static analysis).
+These features are built upon class definitions and type declaration for
+variables. TypeScript also emulates modern JavaScript features such as those
+defined in ECMAScript 6.</p>
+<p>This guide will briefly present TypeScript (version 2), skipping some basic
+concepts (interfaces, encapsulation, inheritance, polymorphism, overriding,
+static members) that are familiar to every developer who has class-based
+object-oriented  programming knowledge. Also, ECMAScript 6 features won&#39;t be
+discussed, as they are treated <a href="http://marcoliceti.xyz/en/guides/ecma-script-6.html">in another
+guide</a>.</p>
+<p>TypeScript compiles (more precisely...
+<a href="https://en.wikipedia.org/wiki/Source-to-source_compiler">&quot;transpiles&quot;</a>) into
+regular JavaScript and that&#39;s why you should follow this guide after installing
+<a href="https://www.typescriptlang.org">the official compiler</a>. Alternatively, you can
+use an <a href="https://www.typescriptlang.org/play/index.html">online tool</a>. When you
+will need to get more serious, try also <a href="https://code.visualstudio.com/">Visual Studio
+Code</a> or another IDE.</p>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#basic-types-and-typed-variable-declarations">Basic types and typed variable declarations</a></li>
+<li><a href="#array-and-tuples">Array and tuples</a></li>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#interfaces">Interfaces</a></li>
+<li><a href="#type-assertions">Type assertions</a></li>
+<li><a href="#classes">Classes</a></li>
+<li><a href="#implementing-interfaces">Implementing interfaces</a></li>
+<li><a href="#encapsulation">Encapsulation</a></li>
+<li><a href="#static-members">Static members</a></li>
+<li><a href="#inheritance-and-polymorphism">Inheritance and polymorphism</a></li>
+<li><a href="#overriding">Overriding</a></li>
+<li><a href="#abstract-classes">Abstract classes</a></li>
+<li><a href="#generics">Generics</a></li>
+</ul>
+<h2 id="basic-types-and-typed-variable-declarations">Basic types and typed variable declarations</h2>
+<ul>
+<li>boolean</li>
+<li>number</li>
+<li>string</li>
+<li>void (can only be <code>null</code> e <code>undefined</code>)</li>
+<li>any (can be any value)</li>
+</ul>
+<p>Examples:</p>
+<pre><code>let n: number = 7; // OK
+let s: string = &#39;hello&#39;; // OK
+let b: boolean = true; // OK
+let x: void = null; // OK
+let y: any = &#39;thing&#39;; // OK
+
+n = &#39;7&#39;; // Error(string assigned to number)
+s = 42; // Error (number assigned to string)
+b = &#39;true&#39;; // Error (string assigned to boolean)
+x = &#39;foo&#39;; // Error (not null, not undefined)
+</code></pre><p>You can omit types and rely on type inference:</p>
+<pre><code>let n = 7; // (type number inferred)
+n = &#39;hello&#39;; // Error (string assegnata a number)
+</code></pre><p><strong>Nota:</strong> Uninitialized variables with no type declaration (eg. <code>let x;</code>) are
+considered <code>any</code> variables.</p>
+<h2 id="array-and-tuples">Array and tuples</h2>
+<p>Arrays can be declared like this:</p>
+<pre><code>let n: number[];
+</code></pre><p>or:</p>
+<pre><code>let n: Array&lt;number&gt;;
+</code></pre><p>TypeScript arrays can only store values of the declared type:</p>
+<pre><code>let n: number[];
+n = [ 1, 2, 3 ]; // OK
+n = [ &#39;1&#39;, &#39;2&#39;, &#39;3&#39; ]; // Error
+</code></pre><p>If you need to store different types in the same array (just like in JavaScript)
+you can use tuples:</p>
+<pre><code>let rating: [ string, number ];
+rating = [ &#39;Matrix&#39;, 5 ]; // OK
+rating = [ &#39;Sharknado, &#39;1&#39; ]; // Error
+</code></pre><p>The type inference systems supports arrays too:</p>
+<pre><code>let n = [ 1, 2, 3 ]; // number[]
+</code></pre><h2 id="functions">Functions</h2>
+<p>You can specify parameter types and return type:</p>
+<pre><code>function sum(a: number, b: number): number {
+  return a + b;
+}
+sum(2, 2); // 4
+sum(&#39;2&#39;, &#39;2&#39;); // Error
+</code></pre><p>It&#39;s usually safe to omit the return type and rely on type inference:</p>
+<pre><code>function sum(a: number, b: number) {
+  return a + b;
+}
+let s: string = sum(2, 2); // Error (number assigned to string)
+</code></pre><h2 id="interfaces">Interfaces</h2>
+<p>Interfaces allow to defined object types in terms of expected properties:</p>
+<pre><code>interface Person {
+  name: string;
+  age: number;
+}
+</code></pre><p>Remember that properties can also be methods:</p>
+<pre><code>interface Calculator {
+  sum(a: number, b: number): number;
+  multiply(a: number, b: number): number;
+  ...
+}
+</code></pre><p>Declared properties are implicitly required:</p>
+<pre><code>interface Person {
+  name: string;
+  age: number;
+}
+const marco: Person = { name: &#39;Marco&#39;, age: 30 }; // OK
+const johnDoe: Person = { age: 33 }; // Error (name missing)
+</code></pre><p>...but you can mark them as optional:</p>
+<pre><code>interface Person {
+  name?: string;
+  age: number;
+}
+const marco: Person = { name: &#39;Marco&#39;, age: 30 }; // OK
+const johnDoe: Person = { age: 33 }; // OK
+</code></pre><p>You can&#39;t use unexpected properties:</p>
+<pre><code>interface Person {
+  name?: string;
+  age: number;
+}
+let marco: Person = { name: &#39;Marco&#39;, age: 30 }; // OK
+marco = { name: &#39;Marco&#39;, age: 30, job: &#39;developer&#39; }; // Error
+</code></pre><h2 id="type-assertions">Type assertions</h2>
+<p>You can temporarily treat a variable as if it had a different type:</p>
+<pre><code>interface Person {
+  name: string;
+}
+
+interface Athlete {
+  name: string;
+  sport: string;
+}
+
+const marco: Person = { name: &#39;Marco&#39; };
+marco.sport = &#39;soccer&#39;; // Error
+(marco as Athlete).sport = &#39;soccer&#39;; // OK
+</code></pre><p>There&#39;s also an alternative syntax:</p>
+<pre><code>(&lt;Athlete&gt;marco).sport = &#39;soccer&#39;;
+</code></pre><h2 id="classes">Classes</h2>
+<p>You can define classes and declare their expected istance variables:</p>
+<pre><code>class Person {
+  name: string;
+}
+const marco = new Person();
+marco.name = &#39;Marco&#39;; // OK
+marco.job = &#39;Developer&#39;; // Error
+</code></pre><p>You can define a custom constructor:</p>
+<pre><code>class Person {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+const marco = new Person(&#39;Marco&#39;);
+console.log(marco.name); // &#39;Marco&#39;
+</code></pre><p>You can define one or more instance methods:</p>
+<pre><code>class Person {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  sayHi(): string {
+    return `Hi I&#39;m ${this.name}`;
+  }
+}
+
+const marco = new Person(&#39;Marco&#39;);
+marco.sayHi(); // &#39;Hi I&#39;m Marco&#39;
+</code></pre><p>TypeScript classes compile into JavaScript constructor functions. For instance,
+this code:</p>
+<pre><code>class Person {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+const marco = new Person(&#39;Marco&#39;);
+</code></pre><p>...would be translated into something like:</p>
+<pre><code>function Person(name) {
+  this.name = name;
+}
+var marco = new Person(&#39;Marco&#39;);
+</code></pre><h2 id="implementing-interfaces">Implementing interfaces</h2>
+<p>The implementing class must contain every property declared inside the
+interface:</p>
+<pre><code>interface HasName {
+  name: string;
+}
+
+interface CanTalk {
+  saySomething(what: string);
+}
+
+class Person implements HasName, CanTalk {
+  name: string;
+
+  saySomething(what: string) {
+    console.log(what);
+  }
+}
+</code></pre><h2 id="encapsulation">Encapsulation</h2>
+<pre><code>class Person {
+  private name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+const marco = new Person(&#39;Marco&#39;);
+console.log(marco.name); // Error (private variable)
+</code></pre><p>You can also declare <code>protected</code> instance variables, which makes them directlty
+accessible inside <a href="#inheritance">subclasses</a>.</p>
+<p>You can encapsulate methods too:</p>
+<pre><code>class Example {
+  private aPrivateMethod() {
+    console.log(&#39;OK&#39;);
+  }
+
+  aPublicMethod() {
+    this.aPrivateMethod();
+  }
+}
+
+const example = new Example();
+example.aPrivateMethod(); // Error (private method)
+example.aPublicMethod(); // &#39;OK&#39;
+</code></pre><p>You can also declare <code>readonly</code> instance variables, which can be assigned only
+inside constructors:</p>
+<pre><code>class Person {
+  readonly name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  changeName(newName: string) {
+    this.name = newName; // Error
+  }
+}
+
+const marco = new Person(&#39;Marco&#39;);
+console.log(marco.name); // &#39;Marco&#39;;
+marco.name = &#39;Mario&#39;; // Error
+</code></pre><h2 id="static-members">Static members</h2>
+<p>Static members are attributes or methods of a class. When a TypeScript class is
+compiled, static members become properties of the resulting JavaScript
+constructor function. For instance, this code:</p>
+<pre><code>class Counter {
+  static n: number;
+
+  static initialize() {
+    Counter.n = 0;
+  }
+}
+</code></pre><p>...translates into something like this:</p>
+<pre><code>function Counter() {}
+Counter.initialize = function () {
+  Counter.n = 0;
+};
+</code></pre><h2 id="inheritance-and-polymorphism">Inheritance and polymorphism</h2>
+<pre><code>class Person {
+  protected name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  getName() {
+    return this.name;
+  }
+}
+
+class Athlete extends Person {
+  protected sport: string;
+
+  constructor(name: string, sport: string) {
+    super(name);
+    this.sport = sport;
+  }
+
+  getNameAndSport() {
+    return `${this.name} ${this.sport}`;
+  }
+}
+
+const marco: Person = new Athlete(&#39;Marco&#39;, &#39;Soccer&#39;);
+marco.getName(); // &#39;Marco&#39;
+marco.getNameAndSport(); // Errore
+(marco as Athlete).getNameAndSport(); // &#39;Marco Soccer&#39;
+</code></pre><h2 id="overriding">Overriding</h2>
+<pre><code>class Person {
+  protected name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  sayHi() {
+    return `Hi I&#39;m ${this.name}`;
+  }
+}
+
+class Athlete extends Person {
+  protected sport: string;
+
+  constructor(name: string, sport: string) {
+    super(name);
+    this.sport = sport;
+  }
+
+  sayHi() {
+    return `Hi I&#39;m ${this.name} and I play ${this.sport}`;
+  }
+}
+
+const marcoPerson = new Person(&#39;Marco&#39;);
+const marcoAthlete = new Athlete(&#39;Marco&#39;, &#39;soccer&#39;);
+marcoPerson.sayHi(); // &#39;Hi I&#39;m Marco&#39;
+marcoAthlete.sayHi(); // &#39;Hi I&#39;m Marco and I play soccer&#39;
+</code></pre><h2 id="abstract-classes">Abstract classes</h2>
+<pre><code>abstract class Shape {
+  abstract area(): number;
+}
+
+class Square extends Shape {
+  side: number;
+
+  constructor(side: number) {
+    super();
+    this.side = side;
+  }
+
+  area() {
+    return this.side * this.side;
+  }
+}
+
+const square: Shape = new Square(8);
+square.area(); // 64
+</code></pre><h2 id="generics">Generics</h2>
+<p>You can define generic functions:</p>
+<pre><code>function identity&lt;T&gt;(x: T): T {
+  return x;
+}
+
+identity&lt;number&gt;(7); // 7
+identity&lt;number&gt;(&#39;7&#39;); // Error
+identity&lt;string&gt;(&#39;7&#39;); // &#39;7&#39;
+identity(&#39;7&#39;); // &#39;7&#39; (type string inferred)
+</code></pre><p>...or even generic classes:</p>
+<pre><code>class IdentityCalculator&lt;T&gt; {
+  apply(x: T): T {
+    return x;
+  }
+}
+
+const numberIdentity = new IdentityCalculator&lt;number&gt;();
+numberIdentity.apply(7); // 7
+numberIdentity.apply(&#39;7&#39;); // Error
+
+const stringIdentity = new IdentityCalculator&lt;string&gt;();
+stringIdentity.apply(7); // Error
+stringIdentity.apply(&#39;7&#39;); // &#39;7&#39;
+</code></pre>
+    </div>
+    <div id="disqus_thread"></div>
+    <script>
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://marcoliceti-xyz.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+  </body>
+</html>
