@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-113403078-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113403078-1');
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TypeScript</title>
+    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+  </head>
+  <body>
+    <div class="guida">
+<h1 id="javascript">JavaScript</h1>
+<h2 id="sommario">Sommario</h2>
+<p>JavaScript è probabilmente la migliore scelta possibile per chi è in cerca di un
+linguaggio di programmazione da studiare: è semplice iniziare (basta un browser)
+ed è estremamente utile da imparare in quanto permette di sviluppare
+applicazioni web, applicazioni desktop (<a href="https://nodejs.org">Node.js</a>,
+<a href="https://electronjs.org/">Electron</a>) e applicazioni mobile
+(<a href="https://ionicframework.com/">Ionic</a>,
+<a href="https://facebook.github.io/react-native/">React Native</a>) senza dover utilizzare
+altri linguaggi di programmazione.</p>
+<p>In questa guida vengono spiegate brevemente le basi di JavaScript, assumendo che
+il lettore abbia comunque esperienza di sviluppo in altri linguaggi e preferendo
+esempi a spiegazioni esageratamente dettagliate.</p>
+<p><strong>Nota:</strong> Si consiglia di seguire la guida provando gli esempi. È sufficiente
+<a href="https://www.google.it/search?q=aprire+console+browser">aprire la console del proprio browser</a>
+e copiare una a una le istruzioni, osservando come reagisce l&#39;interprete
+JavaScript collegato alla console.</p>
+<h2 id="indice">Indice</h2>
+<ul>
+<li><a href="#variabili">Variabili</a></li>
+<li><a href="#array">Array</a></li>
+<li><a href="#selezione">Selezione</a></li>
+<li><a href="#selezione">Iterazione</a></li>
+<li><a href="#funzioni">Funzioni</a></li>
+<li><a href="#oggetti">Oggetti</a></li>
+<li><a href="#prototipi">Prototipi</a></li>
+</ul>
+<h2 id="variabili">Variabili</h2>
+<p>Si dichiarano con la parola chiave <code>var</code> e non è necessario (e nemmeno
+possibile) specificarne il tipo:</p>
+<pre><code>var x;
+</code></pre><p>I valori assegnabili alle variabili, però, hanno sempre un tipo. Quelli più
+semplici sono numeri, stringhe e booleani:</p>
+<pre><code>var n = 7;
+var s = &#39;hello&#39;;
+var b = true;
+
+typeof n; // &#39;number&#39;
+typeof s; // &#39;string&#39;
+typeof b; // &#39;boolean&#39;
+</code></pre><p><strong>Nota:</strong> Non viene fatta distinzione fra numeri interi e numeri con la virgola.</p>
+<p><strong>Nota:</strong> Così come in molti altri linguaggi, i commenti possono essere inseriti
+con un doppio slash (<code>//</code>) o delimitandoli con <code>/*</code> e <code>*/</code>.</p>
+<p>Come in altri linguaggi, in JavaScript esiste il valore speciale <code>null</code>, che si
+usa per rappresentare valori non validi. C&#39;è poi un valore speciale <code>undefined</code>
+che viene automaticamente assegnato alle variabili non inizializzate:</p>
+<pre><code>var x;
+console.log(x); // undefined
+</code></pre><p><strong>Nota:</strong> <code>console.log</code> è una funzione per stampare a schermo il valore di
+un&#39;espressione.</p>
+<h2 id="array">Array</h2>
+<p>JavaScript ha una sintassi estremamente semplice per la creazione di array:</p>
+<pre><code>var numeri = [ 1, 2, 3 ];
+</code></pre><p>A differenza di altri linguaggi, JavaScript permette di memorizzare valori di
+tipi diversi nello stesso array:</p>
+<pre><code>var caos = [ 1, &#39;ciao&#39;, false, null ];
+</code></pre><p>La sintassi per l&#39;accesso in lettura e in scrittura ai singoli elementi
+dell&#39;array è la stessa vista in molti altri linguaggi:</p>
+<pre><code>var paperi = [ &#39;qui&#39;, &#39;quo&#39;, &#39;qua&#39; ];
+console.log(paperi[0]); // &#39;qui&#39;
+console.log(paperi[1]); // &#39;quo&#39;
+console.log(paperi[2]); // &#39;qua&#39;
+paperi[0] = &#39;paperino&#39;;
+console.log(paperi); // [ &#39;paperino&#39;, &#39;quo&#39;, &#39;qua&#39; ]
+</code></pre><p>Gli array JavaScript hanno tipo <code>object</code>, cioè sono considerati
+<a href="#oggetti">oggetti</a> e come tali hanno delle &quot;proprietà&quot;. Fra queste, la
+proprietà <code>length</code> permette di ottenere la lunghezza dell&#39;array:</p>
+<pre><code>[ &#39;a&#39;, &#39;b&#39;, &#39;c&#39; ].length; // 3
+</code></pre><h2 id="selezione">Selezione</h2>
+<p>Sintassi simile a quella degli altri linugaggi ispirati al C:</p>
+<pre><code>if (x &gt; 5) {
+  console.log(&#39;x è maggiore di 5&#39;);
+} else {
+  console.log(&#39;x è minore di o uguale a 5&#39;);
+}
+</code></pre><p>Nelle espressioni booleane utilizzate per controllare il flusso di esecuzione
+è bene ricordare che in JavaScript esistono test di equivalenza (<code>==</code>) e test di
+uguaglianza (<code>===</code>):</p>
+<pre><code>console.log(&#39;5&#39; == 5); // true (equivalenti...)
+console.log(&#39;5&#39; === 5); // false (...ma non uguali)
+</code></pre><p><strong>Nota:</strong> Analogamente, esistono gli operatori <code>!=</code> e <code>!==</code>.</p>
+<p><strong>Nota:</strong> I test di equivalenza (o di non equivalenza) vanno usati con
+particolare cautela. Il rischio è quello di &quot;portare in giro&quot; nel codice valori
+che si pensa essere di un tipo mentre invece sono di un altro.</p>
+<p>In JavaScript <code>null</code>, <code>undefined</code> e le stringhe vuote sono considerati
+equivalenti a <code>false</code>, perciò è possibile scrivere codice di questo genere:</p>
+<pre><code>if (x) {
+  console.log(&#39;x non ha un valore&#39;);
+} else {
+  console.log(&#39;x vale: &#39; + x);
+}
+</code></pre><h2 id="iterazione">Iterazione</h2>
+<p>Anche in questo caso la sintassi è quella tradizionale di molti altri linguaggi:</p>
+<pre><code>// Contiamo da 1 a 10
+for (var i = 0; i &lt; 10; i++) {
+  console.log(i + 1);
+}
+</code></pre><h2 id="funzioni">Funzioni</h2>
+<p>Così come in altri linuaggi (es. C) in JavaScript una funzione è una sequenza di
+istruzioni parametrizzata e richiamabile attraverso il suo nome:</p>
+<pre><code>function somma(a, b) {
+  return a + b;
+}
+var x = somma(7, 3);
+console.log(x); // 10
+</code></pre><p><strong>Nota:</strong> Così come le variabili, anche i parametri di funzione non hanno tipo.</p>
+<p>A differenza di quello che accade in molti altri linguaggi, in JavaScript le
+funzioni sono considerate alla stregua di altri valori e possono essere
+assegnate a variabile:</p>
+<pre><code>var unaFunzione = function (x) {
+  console.log(x);
+};
+unaFunzione(&#39;Ciao&#39;); // &#39;Ciao&#39;
+</code></pre><p>Questo esempio mostra anche un&#39;altra caratteristica delle funzioni JavaScript:
+possono essere &quot;anonime&quot;. Naturalmente la dichiarazione di funzioni anonime ha
+senso quando la funzione viene immediatamente assegnata a variabile oppure
+quando viene invocata immediatamente:</p>
+<pre><code>(function (x) {
+  console.log(x);
+})(&#39;Ciao&#39;); // &#39;Ciao&#39;
+</code></pre><p>Ovviamente per chi non ha esperienza di sviluppo JavaScript l&#39;invocazione
+immediata può in effetti apparire inutile e si potrebbe pensare di scrivere
+semplicemente la corrispondente sequenza di istruzioni senza utilizzare una
+funzione. L&#39;esempio corrispondente, cioè, potrebbe essere riscritto
+semplicemente così:</p>
+<pre><code>var x = &#39;Ciao&#39;;
+console.log(x); // &#39;Ciao&#39;
+</code></pre><p>In realtà l&#39;invocazione immediata di funzioni ha comunque senso in quanto
+permette di definire variabili locali ad esse, senza &quot;inquinare&quot; lo scope
+corrente:</p>
+<pre><code>function esempio() {
+  var n = 7;
+  console.log(n);
+}
+esempio(); // 7
+console.log(n); // Errore (n qui non esiste)
+</code></pre><p>Di scope parlerò meglio nella <a href="#scope">sezione apposita</a>.</p>
+<p>Riguardo alle funzioni, è importante sapere che in JavaScript è possibile
+passare ad una funzione un numero di argomenti diverso da quello previsto:
+quelli mancanti saranno <code>undefined</code>, mentre quelli in eccesso verranno
+semplicemente ignorati. Esempio:</p>
+<pre><code>function esempio(x1, x2) {
+  if (x2 === undefined) {
+    console.log(x1);
+  } else {
+    console.log([ x1, x2 ]);
+  }
+}
+esempio(7); // 7
+esempio(7, 42); // [ 7, 42 ]
+esempio(7, 42, 666); // [ 7, 42 ]
+</code></pre><p>È anche posssibile usare la parola chiave <code>arguments</code>, che in una funzione
+rappresenta sotto forma di array la sequenza di argomenti con cui è stata
+invocata:</p>
+<pre><code>function esempio() {
+  console.log(arguments[0]);
+  console.log(arguments[1]);
+  console.log(arguments[2]);
+  console.log(arguments.length);
+}
+esempio(&#39;a&#39;, &#39;b&#39;); // &#39;a&#39;, &#39;b&#39;, undefined, 2
+</code></pre><p>Ciò consente di implementare molto facilmente funzioni con un numero variabile
+di parametri.</p>
+<h2 id="scope">Scope</h2>
+<p>In generale lo scope delle variabili JavaScript corrisponde alla funzione in cui
+vengono dichiarate più le eventuali altre funzioni in essa annidate:</p>
+<pre><code>function funzioneEsterna() {
+  var n = 7;
+  function funzioneAnnidata() {
+    // qui la variabile n è ancora accessibile
+    function funzioneAncoraPiuAnnidata() {
+      // anche qui la variabile n è ancora accessibile
+    }
+  }
+}
+</code></pre><p>In altre parole, ogni funzione &quot;cattura&quot; il contesto di esecuzione in cui viene
+dichiarata e si usa il termine &quot;closure&quot; per fare riferimento alla coppia
+costituita appunto dalla funzione dichiarata e dal contesto di esecuzione in cui
+avviene la dichiarazione.</p>
+<p>Le closure permettono di preservare il contesto di esecuzione di una funzione
+anche <strong>dopo</strong> che la sua esecuzione è ormai terminata:</p>
+<pre><code>function esempio(x) {
+  return function () {
+    return x;
+  }
+}
+var f = esempio(7);
+f(); // 7
+</code></pre><p>In questo esempio la funzione <code>f</code> &quot;tiene in vita&quot; il contesto di esecuzione
+della funzione <code>esempio</code> anche dopo che l&#39;esecuzione di quest&#39;ultima è
+terminato.</p>
+<p>Questo genere di comportamento può essere sfruttato in diversi modi, ma è
+importante anche tenere presente che può portare a spreco di memoria.</p>
+<p>È inoltre importante sapere che le variabili JavaScript sono soggette a
+&quot;hoisting&quot; (innalzamento), cioè non importa in quale punto di una funzione
+vengano dichiarate: l&#39;interprete JavaScript si comporterà sempre come se la
+dichiarazione fosse avvenuta all&#39;inizio della funzione. Per intenderci, codice
+di questo tipo:</p>
+<pre><code>function esempio() {
+  console.log(&#39;ciao&#39;);
+  var n = 7;
+}
+</code></pre><p>Viene interpretato come se fosse stato scritto in questo modo:</p>
+<pre><code>function esempio() {
+  var n;
+  console.log(&#39;ciao&#39;);
+  n = 7;
+}
+</code></pre><p>Questo comportamento può causare a volte dei bug molto sottili e quindi molti
+sviluppatori JavaScript cercando di dichiarare sempre tutte le variabili in
+testa alle funzioni.</p>
+<h2 id="oggetti">Oggetti</h2>
+<p>Un oggetto JavaScript è essenzialmente un insieme di coppie nome-valore dette
+&quot;proprietà&quot;:</p>
+<pre><code>var marco = {
+  nome: &#39;Marco&#39;,
+  eta: 30
+};
+console.log(marco.nome); // &#39;Marco&#39;
+console.log(marco.eta); // 30
+</code></pre><p>In questo esempio abbiamo un oggetto con due proprietà chiamate <code>nome</code> ed <code>eta</code>
+con valori <code>&#39;Marco&#39;</code> e <code>30</code> e l&#39;operatore <code>.</code> è stato utilizzato per accedere a
+tali valore dati i corrispondenti nomi. In alternativa, è possibile usare la
+seguente sintassi:</p>
+<pre><code>console.log(marco[&#39;nome&#39;]); // &#39;Marco&#39;
+console.log(marco[&#39;eta&#39;]); // 30
+</code></pre><p>Questa sintassi ha 2 vantaggi. Il primo è che permette di passare il nome della
+proprietà attraverso una variabile:</p>
+<pre><code>var qualeProprieta = &#39;nome&#39;;
+console.log(marco[qualeProprieta]); // &#39;Marco&#39;
+</code></pre><p>L&#39;altro è che permette di utilizzare nomi altrimenti vietati quali nomi
+contenenti spazi e altri caratteri speciali o nomi corrispondenti a parole
+chiave del linguaggio:</p>
+<pre><code>var oggettoStrano = {
+  &#39;proprietà con un nome strano&#39;: 42
+};
+console.log(oggettoStrano[&#39;proprietà con un nome strano&#39;]); // 42
+</code></pre><p>Dato che in JavaScript le funzioni sono considerate valori, le proprietà di un
+oggetto possono anche essere utilizzate come metodi:</p>
+<pre><code>var marco = {
+  diQualcosa: function (cosa) {
+    console.log(cosa);
+  }
+};
+marco.diQualcosa(&#39;ciao&#39;); // &#39;ciao&#39;
+</code></pre><p>Così come in molti altri linguaggi, la parola chiave <code>this</code> può essere
+utilizzata in un metodo per accedere lo stato dell&#39;oggetto sul quale il metodo
+viene invocato:</p>
+<pre><code>var marco = {
+  nome: &#39;Marco&#39;,
+  presentati: function () {
+    console.log(&#39;Ciao sono &#39; + this.nome);
+  }
+};
+marco.presentati(); // &#39;Ciao sono Marco&#39;
+</code></pre><p>Una volta istanziato, un oggetto può essere modificato a piacere, aggiungendo,
+eliminando o modificando le sue proprietà, metodi inclusi:</p>
+<pre><code>var marco = {}; // partiamo da un oggetto vuoto
+marco.nome = &#39;Marco&#39;; // Aggiungiamo una proprietà
+// Aggiungiamo un metodo
+marco.presentati = function () {
+  console.log(&#39;Ciao sono &#39; + this.nome);
+};
+// Aggiungiamo una proprietà, poi la modifichiamo, poi la eliminiamo
+marco.eta = 30;
+marco.eta = 31;
+delete marco.eta;
+</code></pre><p>In JavaScript è molto semplice iterare sulle proprietà di un oggetto:</p>
+<pre><code>var marco = { nome: &#39;Marco&#39;, eta: 30 };
+for (var nomeProprieta in marco) {
+  console.log(marco[nomeProprieta]);
+} // &#39;Marco&#39;, 30
+</code></pre><h2 id="prototipi">Prototipi</h2>
+<p>Le funzioni JavaScript possono essere utilizzate come costruttori di oggetti:</p>
+<pre><code>function Persona(nome) {
+  this.nome = nome;
+  this.presentati = function () {
+    console.log(&#39;Ciao sono &#39; + this.nome);
+  };
+}
+var marco = new Persona(&#39;Marco&#39;);
+marco.presentati(); // &#39;Ciao sono Marco&#39;
+</code></pre><p>Il vantaggio di questa tecnica, rispetto all&#39;uso della sintassi mostrata nella
+sezione precedente, consiste nel fatto che tutti gli oggetti istanziati tramite
+lo stesso costruttore possono essere successivamente estesi operando su un unico
+oggetto, detto &quot;prototipo&quot;, associato a tale costruttore:</p>
+<pre><code>function Persona(nome) {
+  this.nome = nome;
+}
+var marco = new Persona(&#39;Marco&#39;);
+var fabio = new Persona(&#39;Fabio&#39;);
+Persona.prototype.presentati = function () {
+  console.log(&#39;Ciao sono &#39; + this.nome);
+};
+marco.presentati(); // &#39;Ciao sono Marco&#39;
+fabio.presentati(); // &#39;Ciao sono Fabio&#39;
+</code></pre><p>In questo esempio i due oggetti <code>marco</code> e <code>fabio</code> hanno ottenuto automaticamente
+un nuovo metodo dopo essere stati istanziati, semplicemente aggiungendo tale
+metodo al loro prototipo.</p>
+<p>Gli oggetti JavaScript sono liberi di sovrascrivere le proprietà ereditate:</p>
+<pre><code>function Persona(nome) {
+  this.nome = nome;
+  this.presentati = function () {
+    console.log(&#39;Ciao sono &#39; + this.nome);
+  };
+}
+var marco = new Persona(&#39;Marco&#39;);
+var fabio = new Persona(&#39;Fabio&#39;);
+fabio.presentati = function () {
+  console.log(&#39;Mi chiamo &#39; + this.nome);
+};
+marco.presentati(); // &#39;Ciao sono Marco&#39;
+fabio.presentati(); // &#39;Mi chiamo Fabio&#39;
+</code></pre><p>Un altro vantaggio dell&#39;uso di costruttori è la possibilità di effettuare test
+tramite operatore <code>instanceof</code>:</p>
+<pre><code>function Persona(nome) { ... }
+var marco = new Persona(&#39;Marco&#39;);
+marco instanceof Persona; // true
+var cloneDiMarco = { nome: &#39;Marco&#39; };
+cloneDiMarco instanceof Persona; // false
+</code></pre><p>Con questo si concude questa introduzione a JavaScript. Per approfondire
+ulteriormente i concetti appresi si consiglia di iniziare un piccolo progetto
+con requisiti verosimili. Inoltre in questo spazio verranno pubblicate altre
+guide, perciò rimanete sintonizzati :D</p>
+    </div>
+    <div id="disqus_thread"></div>
+    <script>
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://marcoliceti-xyz.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

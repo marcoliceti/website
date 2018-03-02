@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-113403078-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113403078-1');
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TypeScript</title>
+    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+  </head>
+  <body>
+    <div class="guide">
+<h1 id="asynchronous-javascript">Asynchronous JavaScript</h1>
+<h2 id="abstract">Abstract</h2>
+<p>Browsers and <a href="https://nodejs.org">Node.js</a>, which are the two most important
+JavaScript platforms, provide input / output (I/O) operations through
+asynchronous APIs. Many developers find that code using asynchronous APIs is
+hard to write and understand, but it actually has some benefits and can be made
+easier with specific patterns.</p>
+<p>In this guide i will briefly introduce the motivations behind asynchronous APIs,
+the classical ways in which they are used and some advanced &quot;techniques&quot;.</p>
+<h2 id="indice">Indice</h2>
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#callbacks">Callbacks</a></li>
+<li><a href="#promises">Promises</a></li>
+<li><a href="#generators">Generators</a></li>
+<li><a href="#async-await">Async await</a></li>
+</ul>
+<h2 id="background">Background</h2>
+<p>In order to use asynchronous APIs you need of course to understand what they are
+and what they are used for.</p>
+<p>Asynchronous APIs are basically a way to request an operation and specify how to
+react when the operation will be completed, leaving the requesting thread free
+to go on with other work while the requested operation is performed in parallel.</p>
+<p>Asynchronous APIs may be implemented with auxiliary threads. In case of I/O
+operations, more efficient implementations are possibile, but the OS should
+support non blocking I/O.</p>
+<p>So, why would browsers and Node.js need asynchronous APIs? In order to
+understand it, you need first to understand that browsers and Node.js are
+basically event handlers, with events being stuff like clicks on buttons
+(browser) or incoming HTTP requests (Node.js). Events are handled by executing
+JavaScript code specified by the page (browser) or program (Node.js). It&#39;s
+crucial that you understand that <strong>event are handled using a single thread, so
+events are sequentially processed one after another</strong>. Asynchronous APIs are
+thus necessary in order to do I/O, which can be slow, and still process events
+quickly. Without asynchronous APIs the browser can&#39;t keep up with user
+interaction and Node.js can&#39;t handle concurrent requests.</p>
+<p>In some ways, asynchronous APIs are a price we pay for using a single thread for
+event processing. However, <strong>using a single thread has some benefits</strong>: handling
+event one at a time means that <strong>the code handling an event won&#39;t interfere with
+the code handling another event</strong>. Also, <strong>Node.js gains a higher scalability
+and a lower latency from the single approach</strong>.</p>
+<h2 id="callback">Callback</h2>
+<p>So browsers and Node.js are event based. You can &quot;subscribe&quot; to an event and
+pass a &quot;callback&quot; function in order to specify how an event should be handled.
+For instance, here is how you react to a button press inside a web page:</p>
+<pre><code>button.addEventListener(&#39;click&#39;, function () {
+  console.log(&#39;Button pressed!&#39;);
+});
+</code></pre><p>Since the completion of an asynchronous task is itself an event, i.e. browsers
+and Node.js consider it an event and execute JavaScript in response to it,
+asynchronous APIs are based on callback too:</p>
+<pre><code>fs.readFile(&#39;/home/marco/Desktop/example.txt&#39;, &#39;utf8&#39;, function () {
+  console.log(&#39;Read completed!&#39;);
+});
+</code></pre><p>Here the <code>readFile</code> function from the <code>fs</code> module of Node.js is taking a
+callback as last parameter (which is a common convention for JavaScript async
+APIs).</p>
+<p>Callbacks for async APIs usually have parameters representing errors and / or
+data:</p>
+<pre><code>fs.readFile(&#39;/home/marco/Desktop/example.txt&#39;, &#39;utf8&#39;, function (errore, data) {
+  if (errore) {
+    console.log(&#39;Oops: an error occurred!&#39;);
+  } else {
+    console.log(data);
+  }
+});
+</code></pre><p><strong>Note:</strong> Errors are represented as the first parameter by convention.</p>
+<p>Remember that events are handled one at a time, so <strong>callbacks will always be
+executed after the code handling the current event</strong>. For instance, suppose that
+the following is the code handling some event:</p>
+<pre><code>var error = null;
+var data = null;
+fs.readFile(&#39;/home/marco/Desktop/example.txt&#39;, &#39;utf8&#39;, function (e, d) {
+  error = e;
+  data = d;
+});
+if (error) {
+  console.log(&#39;Oops: an error occurred!&#39;);
+} else {
+  console.log(data);
+}
+</code></pre><p>This code is not correct and will always show the error message, even if the
+file will be correctly read. That&#39;s because the <code>if-else</code> will be executed
+before the callback, even if it appears later in the code. What really matters
+is that it appears inside the handler for the current event, while the callback
+will handle a &quot;future&quot; event and thus will be executed later.</p>
+<p>So you should always handle the outcome of an async task inside the
+corresponding callback. This sometimes leads to nested callbacks:</p>
+<pre><code>taskOne(function () {
+  taskTwo(function () {
+    taskThree(function () {
+      taskFour(function () {
+        taskFive(function () {
+          taskSix(function () {
+            taskSeven(function () {
+              // etc.
+            });
+          });
+        });
+      });
+    });
+  });
+});
+</code></pre><p>Such a structure is called &quot;Pyramid of Doom&quot; and it quickly becomes a mess in
+terms of indentation and scope. Promises are a pattern that solves this problem
+and simplify async code in general.</p>
+<h2 id="promises">Promises</h2>
+<p>With promises instead of passing a callback you get a... promise, i.e. an object
+with a <code>then</code> method that can used to specify two distinct callbacks, one for
+success and one for failure.</p>
+<pre><code>var aPromise = readPromise(&#39;/home/marco/Desktop/example.txt&#39;, &#39;utf8&#39;);
+aPromise.then(function (data) {
+  console.log(data);
+}, function (error) {
+  console.log(&#39;An error occurred!&#39;);
+});
+</code></pre><p>Two major benefits are evident:</p>
+<ul>
+<li>callbacks don&#39;t have to be provided immediately</li>
+<li>success and failure are handled independently</li>
+</ul>
+<p>You can <strong>chain</strong> promises and solve the &quot;Pyramid of Doom&quot;:</p>
+<pre><code>taskOne().then(function () {
+  return taskTwo();
+}).then(function () {
+  return taskThree();
+}).then(function () {
+  return taskFour();
+}).then(function () {
+  return taskFive();
+}).then(function () {
+  return taskSix();
+}).then(function () {
+  return taskSeven();
+}); // ecc.
+</code></pre><p>If callbacks only return new promises, the code can be even shorter:</p>
+<pre><code>taskOne().
+  then(taskTwo).
+  then(taskThree).
+  then(taskFour).
+  then(taskFive).
+  then(taskSix).
+  then(taskSeven); // ecc.
+</code></pre><p>A chain of promises is itself a promise and makes it possible to handle failure
+in a single place:</p>
+<pre><code>taskOne().
+  then(taskTwo).
+  then(taskThree).
+  then(function () {
+    console.log(&#39;The three tasks succeded&#39;);
+  }, function () {
+    console.log(&#39;One of the three tasks failed&#39;);
+  });
+</code></pre><p>This should be enough to start using promises.
+<a href="https://promisesaplus.com/">Here</a> you can find a detailed specification that
+can be read in order to fully understand the pattern, which is actually quite
+complex, so you should use some library to help you. Conveniently, ECMAScript 6
+implements promises out of the box. For instance, here is an example of how to
+turn a regular async API into a promise-based API with ECMAScript 6:</p>
+<pre><code>function promiseBasedApi(x) {
+  return new Promise(function (resolve, reject) {
+    regularAsyncApi(x, function (error, y) {
+      if (error) return reject(error);
+      resolve(y);
+    });
+  };
+}
+</code></pre><h2 id="generators">Generators</h2>
+<p>ECMAScript 6 also introduces generators, i.e. function that can be suspended and
+resumed (even multiple times) before returning. As we&#39;ll see in the
+<a href="#async-await">next section</a>, generators allow new async patterns. But let&#39;s
+try to understand their basic usage first.</p>
+<p>Again, generators can suspend. The <code>yield</code> keyword has been introduced for this
+purpose:</p>
+<pre><code>function* exampleOfGenerator() {
+  yield;
+}
+</code></pre><p><strong>Note:</strong> Generators have an asterisk after <code>function</code>.</p>
+<p>One way in which generators are different from regular functions is that calling
+a generator is not enough to actually get it started. Instead, when you call a
+generator you get an iterator object, i.e. an object with a <code>next</code> method that
+finally lets you start the generator:</p>
+<pre><code>function* exampleOfGenerator() {
+  console.log(&#39;Started&#39;);
+  yield;
+}
+var iterator = exampleOfGenerator();
+console.log(&#39;Still not started&#39;);
+iterator.next(); // starts the generator
+</code></pre><p>Execution will suspend when a <code>yield</code> is reached:</p>
+<pre><code>function* exampleOfGenerator() {
+  console.log(&#39;This will be printed&#39;);
+  yield;
+  console.log(&#39;This will NOT be printed&#39;);
+}
+var iterator = exampleOfGenerator();
+iterator.next();
+</code></pre><p>Execution can then be resumed by calling <code>next</code> again:</p>
+<pre><code>function* exampleOfGenerator() {
+  console.log(&#39;This will be printed&#39;);
+  yield;
+  console.log(&#39;This will be printed too&#39;);
+}
+var iterator = exampleOfGenerator();
+iterator.next();
+iterator.next();
+</code></pre><p>So <code>next</code> and <code>yield</code> can be used to switch between the calling function and the
+generator:</p>
+<pre><code>function* exampleOfGenerator() {
+  console.log(&#39;b&#39;);
+  yield;
+  console.log(&#39;d&#39;);
+  yield;
+  console.log(&#39;f&#39;);
+  yield;
+  // etc.
+}
+var iterator = exampleOfGenerator();
+console.log(&#39;a&#39;);
+iterator.next();
+console.log(&#39;c&#39;);
+iterator.next();
+console.log(&#39;e&#39;);
+iterator.next();
+console.log(&#39;g&#39;);
+// etc.
+</code></pre><p>Also, <code>next</code> and <code>yield</code> can be used to pass values to / get values from the
+generator function. Specifically, <code>next</code> returns objects based on values that
+the generator <code>yield</code>s:</p>
+<pre><code>function* exampleOfGenerator() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+var iterator = exampleOfGenerator();
+var n = iterator.next();
+console.log(n); // { value: 1, done: false }
+n = iterator.next();
+console.log(n); // { value: 2, done: false }
+n = iterator.next();
+console.log(n); // { value: 3, done: false }
+n = iterator.next();
+console.log(n); // { value: undefined, done: true }
+</code></pre><p><strong>Note:</strong> The <code>done</code> properties is used to query generator termination.</p>
+<p>In turn, <code>yield</code> gives access to values passed with <code>next</code>:</p>
+<pre><code>function* exampleOfGenerator() {
+  var x;
+  x = yield;
+  console.log(x);
+  x = yield;
+  console.log(x);
+  x = yield;
+  console.log(x);
+}
+var iterator = exampleOfGenerator();
+iterator.next();
+iterator.next(1);
+iterator.next(2);
+iterator.next(3);
+</code></pre><p><strong>Note:</strong> The first <code>next</code> doesn&#39;t pass anything. In other words, the first
+<code>yield</code> receives from the second <code>next</code>, the second <code>yield</code> from the third
+<code>next</code>, and so on.</p>
+<p>You can also trigger an error into a genarator by calling <code>throw</code> on its
+iterator:</p>
+<pre><code>function* exampleOfGenerator() {
+  try {
+    yield;
+  } catch (error) {
+    console.log(error);
+  }
+}
+var iterator = exampleOfGenerator()();
+iterator.next();
+iterator.throw(&#39;fake error&#39;);
+</code></pre><h2 id="async-await">Async await</h2>
+<p>So what do generator have to do with async APIs?</p>
+<p>First of all notice that while a regular JavaScript function is executed
+entirely during the handling of a single event, the execution of a generator may
+span (the handling of) different events. Basically, you just need to call <code>next</code>
+on the same iterator from different callbacks. For instance, here is how you can
+start a generator with a button on a web page and then resume it with another
+button:</p>
+<pre><code>var iterator;
+b1.addEventListener(&#39;click&#39;, function () {
+  iterator = (function* () {
+    console.log(&#39;started by b1...&#39;);
+    yield;
+    console.log(&#39;...resumed by b2&#39;);
+  })();
+  iterator.next();
+});
+b2.addEventListener(&#39;click&#39;, function () {
+  iterator.next();
+});
+</code></pre><p>This makes generators suitable for &quot;waiting&quot; the result of an async task: you
+start waiting by <code>yield</code>ing a promise and then you call <code>next</code> or <code>throw</code> inside
+the callbacks:</p>
+<pre><code>function* example() {
+  try {
+    var result = yield makeMeAPromise();
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+var iterator = example();
+var promise = iterator.next();
+promise.then(function (result) {
+  iterator.next(result);
+}, function (error) {
+  iterator.throw(error);
+});
+</code></pre><p>The code in the previous example may be refactored into this:</p>
+<pre><code>function magicFunction(aGenerator) {
+  var iterator = aGenerator();
+  var promise = iterator.next();
+  promise.then(function (result) {
+    iterator.next(result);
+  }, function (error) {
+    iterator.throw(error);
+  });
+}
+
+magicFunction(function* () {
+  try {
+    var result = yield makeMeAPromise();
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+});
+</code></pre><p><code>magicFunction</code> can be extended in order to support waiting for multiple
+promises:</p>
+<pre><code>magicFunction(function* () {
+  try {
+    var x = yield promiseOne();
+    var y = yield promiseTwo();
+    var z = yield promiseThree();
+    console.log(x + y + z);
+  } catch (error) {
+    console.log(error);
+  }
+});
+</code></pre><p>Now, if you look at the genarator&#39;s body you&#39;ll notice that it&#39;s starting to
+look like plain old synchronous code. From the genarator&#39;s perspective there&#39;s
+no difference between asynchronous values waited with <code>yield</code> and values
+obtained through a synchronous function. In other words, you don&#39;t need anymore
+callbacks or complex promise compositions: you just write &quot;regular&quot; code except
+that you put <code>yield</code> before promises.</p>
+<p>Of course this works only if you have a suitable <code>magicFunction</code>. You can find a
+sample implementation <a href="https://www.promisejs.org/generators/">here</a> and of
+course you can make your own. In ECMAScript 2017 you won&#39;t need to do that: the
+generator based pattern seen in this section is natively supported with
+dedicated syntax. Specifically, you can declare <code>async</code> functions and use the
+<code>await</code> keyword inside them:</p>
+<pre><code>async function example() {
+  try {
+    var x = await promiseOne();
+    var y = await promiseTwo();
+    var z = await promiseThree();
+    console.log(x + y + z);
+  } catch (error) {
+    console.log(error);
+  }
+}
+</code></pre><p>This will be internally translated into something like:</p>
+<pre><code>async(function* () {
+  try {
+    var x = yield promiseOne();
+    var y = yield promiseTwo();
+    var z = yield promiseThree();
+    console.log(x + y + z);
+  } catch (error) {
+    console.log(error);
+  }
+});
+</code></pre><p>Where <code>async</code> is a function similar to the <code>magicFunction</code> seen in the previous
+examples.</p>
+<p>This conclude our asynchronous JavaScript overview ;)</p>
+    </div>
+    <div id="disqus_thread"></div>
+    <script>
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://marcoliceti-xyz.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

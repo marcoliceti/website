@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-113403078-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113403078-1');
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TypeScript</title>
+    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+  </head>
+  <body>
+    <div class="guida">
+<h1 id="javascript-asincrono">JavaScript asincrono</h1>
+<h2 id="sommario">Sommario</h2>
+<p>Nelle due principali implementazioni di JavaScript, i browser e
+<a href="https://nodejs.org">Node.js</a>, le operazioni di input / output (I/O) sono
+offerte attraverso API asincrone. Per molti sviluppatori il modo di lavorare che
+ne consegue risulta poco intuitivo e/o poco pratico, ma in realtà ha i suoi
+vantaggi e può essere reso decisamente più agevole attraverso l&#39;uso di appositi
+pattern e di sintassi dedicata.</p>
+<p>In questa guida introdurrò brevemente le motivazioni dietro l&#39;uso di API
+asincrone in JavaScript, il modo classico di utilizzarle ed alcune &quot;tecniche
+avanzate&quot;.</p>
+<h2 id="indice">Indice</h2>
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#callback">Callback</a></li>
+<li><a href="#promesse">Promesse</a></li>
+<li><a href="#generator">Generator</a></li>
+<li><a href="#async-await">Async await</a></li>
+</ul>
+<h2 id="background">Background</h2>
+<p>Prima di poter lavorare efficacemente con API asincrone è ovviamente necessario
+capire cosa sono e a che servono.</p>
+<p>Un&#39;API asincrona è essenzialmente un meccanismo per richiedere operazioni e
+specificare come reagire al loro completamento, lasciando però il thread
+chiamante libero di proseguire mentre tali operazioni vengono svolte in
+parallelo. Le API asincrone possono essere quindi implementate mediante thread
+ausiliari. Nel caso di operazioni di I/O (che poi sono quelle per le quali le
+API asincrone vengono impiegate più spesso) esistono anche meccanismi più
+efficienti che richiedono però un supporto da parte del sistema operativo
+all&#39;I/O non bloccante.</p>
+<p>Ma a cosa serve avere API asincrone nel browser e in Node.js? Per capirlo
+occorre partire dal fatto che il browser e Node.js sono essenzialmente dei
+gestori di eventi, come ad esempio il click su un bottone (browser) o la
+ricezione di una richiesta HTTP (Node.js). La gestione di questi eventi avviene
+eseguendo il codice JavaScript specificato dalla pagina (o dal programma nel
+caso di Node.js). Un aspetto cruciale è che <strong>la gestione degli eventi viene
+sempre effettuata utilizzando solo un thread dunque gli eventi vengono gestiti
+uno per volta</strong>. In quest&#39;ottica le API asincrone servono ad avviare operazioni
+anche molto lunghe senza impattare sulla durata della gestione di un evento
+corrente e, quindi, senza ritardare troppo la gestione del prossimo evento.
+Senza API asincrone il browser non potrebbe rimanere al passo con le azioni
+dell&#39;utente e Node.js non potrebbe gestire richieste concorrenti.</p>
+<p>Per certi versi le API asincrone sono dunque il prezzo da pagare per l&#39;uso di un
+solo thread per la gestione di eventi. D&#39;altro canto <strong>l&#39;utilizzo di un solo
+thread comporta degli importanti benefici</strong>: gestire un solo evento per volta
+vuol dire che <strong>la gestione di un evento non interferirà mai con quella di un
+altro</strong>. Inoltre, <strong>nel caso di Node.js, non dover istanziare un thread per ogni
+richiesta permette di una maggiore scalabilità ed una minore latenza</strong>.</p>
+<h2 id="callback">Callback</h2>
+<p>Come anticipato, browser e Node.js funzionano ad eventi. Esistono meccanismi di
+sottoscrizione che permettono di definire sotto forma di funzione, detta
+&quot;callback&quot;, il codice da eseguire per effettuare la gestione di un dato evento.
+Ad esempio in una pagina web la definizione di come debba essere gestito il
+click su un certo bottone può essere effettuata come segue:</p>
+<pre><code>bottone.addEventListener(&#39;click&#39;, function () {
+  console.log(&#39;Pulsante premuto!&#39;);
+});
+</code></pre><p>Poiché il completamento di un operazione asincrona è considerato un evento (cioè
+il browser e Node.js lo trattano come tale, ovvero eseguendo codice JavaScript
+in risposta ad esso), anche le API asincrone sono basate sull&#39;uso di callback:</p>
+<pre><code>fs.readFile(&#39;/home/marco/Desktop/esempio.txt&#39;, &#39;utf8&#39;, function () {
+  console.log(&#39;Operazione completata!&#39;);
+});
+</code></pre><p>In questo esempio la funzione <code>readFile</code> del modulo <code>fs</code> di Node.js, che
+permette di leggere un file, prende una callback come ultimo parametro (che per
+altro è una convenzione piuttosto comune a fra le API asincrone JavaScript).</p>
+<p>La callback passata ad un&#39;API asincrona può avere a sua volta dei parametri che
+rappresentano l&#39;esito dell&#39;operazione:</p>
+<pre><code>fs.readFile(&#39;/home/marco/Desktop/esempio.txt&#39;, &#39;utf8&#39;, function (errore, dati) {
+  if (errore) {
+    console.log(&#39;Ops: si è verificato un errore!&#39;);
+  } else {
+    console.log(dati);
+  }
+});
+</code></pre><p>Convenzionalmete il primo parametro è quello che rappresenta l&#39;eventuale errore
+che ha fatto fallire l&#39;operazione (se è fallita) mentre i parametri successivi
+rappresentano gli eventuali valori restituiti dall&#39;operazione in caso di
+successo.</p>
+<p>Nel lavorare con API asincrone bisogna sempre ricordare che JavaScript gestisce
+un solo evento per volta e che perciò le callback non saranno mai eseguite prima
+del termine della gestone dell&#39;evento corrente. Ad esempio, supponiamo che
+durante la gestione di un evento venga eseguito il seguente codice:</p>
+<pre><code>var errore = null;
+var dati = null;
+fs.readFile(&#39;/home/marco/Desktop/esempio.txt&#39;, &#39;utf8&#39;, function (e, d) {
+  errore = e;
+  dati = d;
+});
+if (errore) {
+  console.log(&#39;Ops: si è verificato un errore!&#39;);
+} else {
+  console.log(dati);
+}
+</code></pre><p>Tale codice è errato e mostrerà sempre il messaggio di errore, anche se la
+lettura del file avrà successo. Il motivo è semplice: la parte <code>if-else</code> che
+determina la selezione del messaggio corretto, nonostante appaia per ultima nel
+codice, viene eseguita prima della callback passata a <code>readFile</code>. Il codice
+all&#39;interno di tale callback, infatti, viene sì definito durante la gestione
+dell&#39;evento corrente, ma verrà eseguito durante la gestione di un altro evento,
+ovvero il completamento della lettura del file.</p>
+<p>Il codice che gestisce l&#39;esito di un&#39;operazione asincrona, quindi, va sempre
+scritto tutto all&#39;interno della rispettiva callback. Nel caso esso stesso
+contenga chiamate asincrone si avrà quindi una callback nella callback e in
+generale una sequenza di operazioni asincrone può assumere un aspetto simile al
+seguente:</p>
+<pre><code>operazioneUno(function () {
+  operazioneDue(function () {
+    operazioneTre(function () {
+      operazioneQuattro(function () {
+        operazioneCinque(function () {
+          operazioneSei(function () {
+            operazioneSette(function () {
+              // ecc.
+            });
+          });
+        });
+      });
+    });
+  });
+});
+</code></pre><p>Nella comunità JavaScript questo genere di struttura è ironicamente chiamata
+&quot;Pyramid of Doom&quot; ed è evidente come possa diventare rapidamente difficile da
+gestire in termini di indentazione e di scope. Quando poi si passa da una
+semplice sequenza prefissata a flussi più complessi scrivere codice manutenibile
+in questo modo diventa un&#39;impresa, perciò sono emersi pattern specifici per la
+semplificazione del codice asincrono e fra questi il pattern delle promesse è il
+più popolare.</p>
+<h2 id="promesse">Promesse</h2>
+<p>L&#39;idea alla base delle promesse è relativamente semplice. Al momento di invocare
+un&#39;API asincrona, invece di passare una callback, ci si aspetta semmai di
+ricevere un oggetto, chiamato appunto &quot;promessa&quot;, dotato di un metodo <code>next</code> che
+permette di specificare due distinte callback: una per gestire il successo
+dell&#39;operazione e l&#39;altra per gestirne il fallimento.</p>
+<p>Ad esempio un&#39;operazione per la lettura di un file potrebbe avvenire in modo
+simile al seguente:</p>
+<pre><code>var promessa = leggiFile(&#39;/home/marco/Desktop/esempio.txt&#39;, &#39;utf8&#39;);
+promessa.then(function (dati) {
+  console.log(dati);
+}, function (errore) {
+  console.log(&#39;Si è verificato un errore!&#39;);
+});
+</code></pre><p>Rispetto all&#39;approccio &quot;tradizionale&quot;, sono già evidenti due miglioramenti:</p>
+<ul>
+<li>la richiesta della promessa e la definizione delle callback sono indipendenti</li>
+<li>così come sono indipendenti la gestione del successo e quella del fallimento</li>
+</ul>
+<p>Le promesse, poi, permettono di risolvere la &quot;Pyramid of Doom&quot; attraverso un
+meccanismo di concatenazione basato su singola callback e in cui ogni callback
+restituisce la promessa associata all&#39;operazione asincrona successiva:</p>
+<pre><code>operazioneUno().then(function () {
+  return operazioneDue();
+}).then(function () {
+  return operazioneTre();
+}).then(function () {
+  return operazioneQuattro();
+}).then(function () {
+  return operazioneCinque();
+}).then(function () {
+  return operazioneSei();
+}).then(function () {
+  return operazioneSette();
+}); // ecc.
+</code></pre><p>Se le callback si limitano a restituire una promessa, è anche possibile
+utilizzare la seguente forma, ancora più concisa:</p>
+<pre><code>operazioneUno().
+  then(operazioneDue).
+  then(operazioneTre).
+  then(operazioneQuattro).
+  then(operazioneCinque).
+  then(operazioneSei).
+  then(operazioneSette); // ecc.
+</code></pre><p>Il risultato della concatenazione di promesse è a sua volta una promessa
+rappresentante l&#39;intera sequenza e permette di gestire in maniera centralizzata
+il fallimento di una qualunque delle operazioni nella sequenza:</p>
+<pre><code>operazioneUno().
+  then(operazioneDue).
+  then(operazioneTre).
+  then(function () {
+    console.log(&#39;Le tre operazioni hanno avuto successo&#39;);
+  }, function () {
+    console.log(&#39;Una delle tre operazioni è fallita&#39;);
+  });
+</code></pre><p>Una trattazione più esaustiva delle promesse richiederebbe una guida a parte, ma
+gli esempi mostrati sono già sufficienti a muovere i primi passi con le
+promesse. A <a href="https://promisesaplus.com/">questo indirizzo</a> sono poi disponibili
+delle specifiche complete che possono essere usate per capire meglio tutti gli
+effettivi requisiti del pattern. Come si potrà facilmente verificare, si tratta
+di un pattern in realtà piuttosto complesso, perciò invece che implementarlo
+autonomamente gli sviluppatori JavaScript utilizzano librerie di supporto che
+permettono di creare promesse conformi alle specifiche. Nella versione
+ECMAScript 6 di JavaScript le funzioni offerte da queste librerie sono persino
+diventate parte delle API standard delle linguaggio e dunque non è necessaria
+alcuna libreria. Ecco quindi un esempio di come trasformare un&#39;API asincrona
+tradizionale in una basata su promesse utilizzando ECMAScript 6:</p>
+<pre><code>function apiConPromessa(x) {
+  return new Promise(function (resolve, reject) {
+    apiAsincronaTradizionale(x, function (errore, y) {
+      if (errore) return reject(errore);
+      resolve(y);
+    });
+  };
+}
+</code></pre><h2 id="generator">Generator</h2>
+<p>Oltre al supporto alle promesse, ECMAScript 6 introduce i generator, ovvero
+funzioni che possono essere sospese e riprese (anche più volte) prima di
+terminare la propria esecuzione. Come vedremo nella
+<a href="#async-await">prossima sezione</a>, i generator permettono di gestire il codice
+asincrono in nuovi modi. In questa sezione, però, cerchiamo prima di capire il
+loro funzionamento generale.</p>
+<p>Come detto, un generator può sospendere la propria esecuzione. In particolare
+ECMAScript 6 introduce a tal proposito la parola chiave <code>yield</code>:</p>
+<pre><code>function* esempioDiGenerator() {
+  yield;
+}
+</code></pre><p><strong>Nota:</strong> Per dichiarare una generator occorre aggiungere un asterisco
+alla parola chiave <code>function</code>.</p>
+<p>Uno dei modi in cui i generator si distinguono dalle normali funzioni è il fatto
+che non è sufficiente invocarli per avviarne l&#39;esecuzione. Piuttosto quando una
+generator viene invocato, esso restituisce immediatamente un oggetto chiamato
+&quot;iterator&quot; con un metodo <code>next</code> che permette finalmente di avviare l&#39;esecuzione
+del generator:</p>
+<pre><code>function* esempioDiGenerator() {
+  console.log(&#39;Esecuzione iniziata&#39;);
+  yield;
+}
+var iteratore = esempioDiGenerator();
+console.log(&#39;Esecuzione non ancora iniziata&#39;);
+iteratore.next(); // avvia l&#39;esecuzione
+</code></pre><p>Una volta avviata, l&#39;esecuzione prosegue fino a quando non viene incontrata la
+parola chiave <code>yield</code>:</p>
+<pre><code>function* esempioDiGenerator() {
+  console.log(&#39;Questo messaggio sarà mostrato&#39;);
+  yield;
+  console.log(&#39;Questo no&#39;);
+}
+var iteratore = esempioDiGenerator();
+iteratore.next();
+</code></pre><p>Chiamando nuovamente <code>next</code> sarà possibile riprendere l&#39;eseuzione del generator:</p>
+<pre><code>function* esempioDiGenerator() {
+  console.log(&#39;Questo messaggio sarà mostrato&#39;);
+  yield;
+  console.log(&#39;E anche questo&#39;);
+}
+var iteratore = esempioDiGenerator();
+iteratore.next();
+iteratore.next();
+</code></pre><p>Il metodo <code>next</code> e <code>yield</code> permettono quindi di alternare l&#39;esecuzione della
+funzione chiamante e quella del generator:</p>
+<pre><code>function* esempioDiGenerator() {
+  console.log(&#39;b&#39;);
+  yield;
+  console.log(&#39;d&#39;);
+  yield;
+  console.log(&#39;f&#39;);
+  yield;
+  // ecc.
+}
+var iteratore = esempioDiGenerator();
+console.log(&#39;a&#39;);
+iteratore.next();
+console.log(&#39;c&#39;);
+iteratore.next();
+console.log(&#39;e&#39;);
+iteratore.next();
+console.log(&#39;g&#39;);
+// ecc.
+</code></pre><p>Inoltre <code>next</code> e <code>yield</code> permettono di scambiare valori fra le due funzioni. In
+particolare, <code>next</code> restituisce ogggetti basati sui valori inviati da <code>yield</code>:</p>
+<pre><code>function* esempioDiGenerator() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+var iteratore = esempioDiGenerator();
+var n = iteratore.next();
+console.log(n); // { value: 1, done: false }
+n = iteratore.next();
+console.log(n); // { value: 2, done: false }
+n = iteratore.next();
+console.log(n); // { value: 3, done: false }
+n = iteratore.next();
+console.log(n); // { value: undefined, done: true }
+</code></pre><p><strong>Nota:</strong> La proprietà <code>done</code> permette di sapere se l&#39;esecuzione del generator
+è terminata.</p>
+<p>A sua volta <code>yield</code> fornisce accesso agli eventuali valori passati tramite
+<code>next</code>:</p>
+<pre><code>function* esempioDiGenerator() {
+  var x;
+  x = yield;
+  console.log(x);
+  x = yield;
+  console.log(x);
+  x = yield;
+  console.log(x);
+}
+var iteratore = esempioDiGenerator();
+iteratore.next();
+iteratore.next(1);
+iteratore.next(2);
+iteratore.next(3);
+</code></pre><p><strong>Nota:</strong> La prima invocazione di <code>next</code> non passa alcun valore. In altre
+parole, il primo <code>yield</code> riceve il valore passato dal secondo <code>next</code>, il secondo
+<code>yield</code> riceve dal terzo <code>next</code>, e così via.</p>
+<p>L&#39;iterator permette anche di provocare un&#39;eccezione all&#39;interno del
+corrispondente generator:</p>
+<pre><code>function* esempioDiGenerator() {
+  try {
+    yield;
+  } catch (errore) {
+    console.log(errore);
+  }
+}
+var iteratore = esempioDiGenerator();
+iteratore.next();
+iteratore.throw(&#39;finto errore&#39;);
+</code></pre><h2 id="async-await">Async await</h2>
+<p>Ok: cosa c&#39;entrano i generator con le API asincrone?</p>
+<p>Per capirlo osserviamo anzitutto che una normale funzione JavaScript viene
+interamente eseguita nel corso della gestione di un singolo evento, mentre
+l&#39;esecuzione di un generator può iniziare durante la gestione di un evento,
+essere sospesa e poi riprendere durante la gestione di un altro evento: è
+sufficiente che le callback che gestiscono i due eventi abbiano entrambe accesso
+all&#39;iterator che controlla il generator. Ad esempio, dati due bottoni su una
+pagina web, il secondo bottone può far riprendere l&#39;esecuzione di un generator
+avviato dal primo bottone:</p>
+<pre><code>var iteratore;
+b1.addEventListener(&#39;click&#39;, function () {
+  iteratore = (function* () {
+    console.log(&#39;esecuzione avviata da b1...&#39;);
+    yield;
+    console.log(&#39;...e ripresa da b2&#39;);
+  })();
+  iteratore.next();
+});
+b2.addEventListener(&#39;click&#39;, function () {
+  iteratore.next();
+});
+</code></pre><p>I generator possono quindi essere utilizzati per scrivere codice in grado di
+&quot;attendere&quot; il risultato di un&#39;operazione asincrona: l&#39;attesa inizia
+all&#39;interno del generator facendo lo <code>yield</code> di una promessa e termina quando
+da una delle callback della promessa viene chiamato <code>next</code> o <code>throw</code>. Esempio:</p>
+<pre><code>function funzioneMagica(unGenerator) {
+  var iteratore = unGenerator();
+  var promessa = iteratore.next();
+  promessa.then(function (risultato) {
+    iteratore.next(risultato);
+  }, function (errore) {
+    iteratore.throw(errore);
+  });
+}
+
+funzioneMagica(function* () {
+  try {
+    var risultato = yield fammiUnaPromessa();
+    console.log(risultato);
+  } catch (errore) {
+    console.log(errore);
+  }
+});
+</code></pre><p>Estendendo opportunamente <code>funzioneMagica</code> possiamo arrivare poi a scrivere
+generator che &quot;attendono&quot; più promesse:</p>
+<pre><code>function funzioneMagica(unGenerator) {
+  var iteratore = unGenerator();
+  var promessa = iteratore.next();
+  promessa.then(function (risultato) {
+    iteratore.next(risultato);
+  }, function (errore) {
+    iteratore.throw(errore);
+  });
+}
+
+funzioneMagica(function* () {
+  try {
+    var risultato = yield fammiUnaPromessa();
+    console.log(risultato);
+  } catch (errore) {
+    console.log(errore);
+  }
+});
+</code></pre><p>Estendendo opportunamente <code>funzioneMagica</code> possiamo arrivare a scrivere
+generator che &quot;attendono&quot; più promesse:</p>
+<pre><code>funzioneMagica(function* () {
+  try {
+    var x = yield promessaUno();
+    var y = yield promessaDue();
+    var z = yield promessaTre();
+    console.log(x + y + z);
+  } catch (errore) {
+    console.log(errore);
+  }
+});
+</code></pre><p>Ora, se focalizziamo l&#39;attenzione sul corpo del generator ci rendiamo conto che
+questo modo di scrivere il codice fa sembrare sincrono il codice asincrono. In
+particolare dal punto di vista del generator i &quot;valori asincroni&quot; attesi con lo
+<code>yield</code> di una promessa sono del tutto equivalenti a quelli sincroni / ottenuti
+immediatamente con una normale funzione. Di conseguenza non serve scrivere più
+alcuna callback né sbizzarrirsi nella composizione di promesse: è sufficiente
+scrivere codice lo stesso codice che si sarebbe scritto con API sincrone, avendo
+cura di premettere <code>yield</code> alle invocazioni che restituiscono promesse.</p>
+<p>Naturalmente queste affermazioni presuppongono la disponibilità di codice in
+grado di gestire correttamente le promesse su cui viene invocato <code>yield</code>. Negli
+esempi precedenti abbiamo visto un&#39;implementazione (<code>funzioneMagica</code>) che andava
+bene per uno scenario estremamente semplificato, ma con un po&#39; di fantasia e
+bravura è possibile scriverne una versione in grado di coprire un numero non
+prefissato di promesse e di supportare la parametrizzazione del generator. Si
+veda ad esempio l&#39;implementazione disponibile a
+<a href="https://www.promisejs.org/generators/">questo indirizzo</a>.</p>
+<p>Ora, il pattern descritto in questa sezione si chiama &quot;async / await&quot; e in
+ECMAScript 2017 è implementato nativamente, per altro anche attraverso sintassi
+dedicata. In particolare una funzione può essere marcata come <code>async</code> e
+attendere un numero generico di promesse tramite parola chiave <code>await</code>:</p>
+<pre><code>async function esempio() {
+  try {
+    var x = await promessaUno();
+    var y = await promessaDue();
+    var z = await promessaTre();
+    console.log(x + y + z);
+  } catch (errore) {
+    console.log(errore);
+  }
+}
+</code></pre><p>Tale codice sarà internamente convertito in qualcosa di simile a:</p>
+<pre><code>async(function* () {
+  try {
+    var x = yield promessaUno();
+    var y = yield promessaDue();
+    var z = yield promessaTre();
+    console.log(x + y + z);
+  } catch (errore) {
+    console.log(errore);
+  }
+});
+</code></pre><p>... e con questo si chiude la nostra panoramica sulla programmazione asincrona
+in JavaScript! ;)</p>
+    </div>
+    <div id="disqus_thread"></div>
+    <script>
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://marcoliceti-xyz.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+  </body>
+</html>

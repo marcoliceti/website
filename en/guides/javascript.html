@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-113403078-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113403078-1');
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>TypeScript</title>
+    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="../../css/animations.css">
+  </head>
+  <body>
+    <div class="guide">
+<h1 id="javascript">JavaScript</h1>
+<h2 id="abstract">Abstract</h2>
+<p>If you&#39;re searching for a programming language to learn, JavaScript is probably
+the best option: it&#39;s easy to get started (you just need a web browser) and is
+a very useful language to learn since it allows to develop web apps, dekstop
+apps (<a href="https://nodejs.org">Node.js</a>, <a href="https://electronjs.org/">Electron</a>),
+mobile apps (<a href="https://ionicframework.com/">Ionic</a>,
+<a href="https://facebook.github.io/react-native/">React Native</a>) <strong>by using a single
+programming language</strong>.</p>
+<p>This guide briefly explains JavaScript fundamentals with some examples. Prior
+programming knowledge is assumed.</p>
+<p><strong>Tip:</strong> Use
+<a href="https://www.google.it/search?q=how+to+open+browser+console">your browser&#39;s console</a>
+to try the examples in this guide.</p>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#variables">Variables</a></li>
+<li><a href="#arrays">Arrays</a></li>
+<li><a href="#conditionals">Conditionals</a></li>
+<li><a href="#loops">Loops</a></li>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#objects">Objects</a></li>
+<li><a href="#prototypes">Prototypes</a></li>
+</ul>
+<h2 id="variables">Variables</h2>
+<p>In JavaScript variables are declared with <code>var</code>. No need to specify a type:</p>
+<pre><code>var x;
+</code></pre><p>Values, though, do have type. The simplest ones are numbers, strings and
+booleans:</p>
+<pre><code>var n = 7;
+var s = &#39;hello&#39;;
+var b = true;
+
+typeof n; // &#39;number&#39;
+typeof s; // &#39;string&#39;
+typeof b; // &#39;boolean&#39;
+</code></pre><p><strong>Note:</strong> There&#39;s no distinction between integers and floats.</p>
+<p><strong>Note:</strong> Comments are inserted with <code>//</code> or <code>/*</code> and <code>*/</code>.</p>
+<p>You can use <code>null</code> to represent non-valid values. There&#39;s also a special
+<code>undefined</code> value which is automatically given to non-initialized variables:</p>
+<pre><code>var x;
+console.log(x); // undefined
+</code></pre><p><strong>Note:</strong> <code>console.log</code> prints values to the console.</p>
+<h2 id="arrays">Arrays</h2>
+<p>JavaScript has a very simple syntax for array literals:</p>
+<pre><code>var numeri = [ 1, 2, 3 ];
+</code></pre><p>Unlike other languages, JavaScript allows arrays to contain values of different
+types:</p>
+<pre><code>var chaos = [ 1, &#39;hello&#39;, false, null ];
+</code></pre><p>This is how you access individual array elements:</p>
+<pre><code>var chars = [ &#39;a&#39;, &#39;b&#39;, &#39;c&#39; ];
+console.log(chars[0]); // &#39;a&#39;
+console.log(chars[1]); // &#39;b&#39;
+console.log(chars[2]); // &#39;c&#39;
+chars[0] = &#39;z&#39;;
+console.log(chars); // [ &#39;z&#39;, &#39;b&#39;, &#39;c&#39; ]
+</code></pre><p>JavaScript arrays have type <code>object</code> and can have properties. The most useful
+one is <code>length</code>:</p>
+<pre><code>[ &#39;a&#39;, &#39;b&#39;, &#39;c&#39; ].length; // 3
+</code></pre><h2 id="conditionals">Conditionals</h2>
+<p>Same syntax as C and many other languages:</p>
+<pre><code>if (x &gt; 5) {
+  console.log(&#39;x is bigger than 5&#39;);
+} else {
+  console.log(&#39;x is lower than or equal to 5&#39;);
+}
+</code></pre><p>In boolean expressions remember that JavaScript has sloppy (<code>==</code>) and strict
+(<code>===</code>) equal tests:</p>
+<pre><code>console.log(&#39;5&#39; == 5); // true
+console.log(&#39;5&#39; === 5); // false
+</code></pre><p><strong>Note:</strong> There are also <code>!=</code> and <code>!==</code> operator with similar semantics.</p>
+<p><strong>Note:</strong> Use <code>==</code> and <code>!=</code> with caution. There&#39;s risk in propagating values
+with unpredictable type.</p>
+<p>In JavaScript <code>null</code>, <code>undefined</code> and empty strings are equivalent to <code>false</code>,
+so conditionals are often written like this:</p>
+<pre><code>if (x) {
+  console.log(&#39;x has no value&#39;);
+} else {
+  console.log(&#39;x is: &#39; + x);
+}
+</code></pre><h2 id="loops">Loops</h2>
+<p>Same syntax as many other languages:</p>
+<pre><code>// Counting from 1 to 10
+for (var i = 0; i &lt; 10; i++) {
+  console.log(i + 1);
+}
+</code></pre><h2 id="functions">Functions</h2>
+<p>A JavaScript function is a parametrized sequence of instructions:</p>
+<pre><code>function sum(a, b) {
+  return a + b;
+}
+var x = sum(7, 3);
+console.log(x); // 10
+</code></pre><p><strong>Note:</strong> Just like variables, parameters have no type.</p>
+<p>JavaScript functions are treated as values so you can assign them to variables:</p>
+<pre><code>var aFunction = function (x) {
+  console.log(x);
+};
+aFunction(&#39;Hi&#39;); // &#39;Hi&#39;
+</code></pre><p>This example also shows another JavaScript feature: anonymous functions.</p>
+<p>Anonymous functions make sense when immediately assigned or invoked:</p>
+<pre><code>(function (x) {
+  console.log(x);
+})(&#39;Hi&#39;); // &#39;Hi&#39;
+</code></pre><p>Immediately invoked functions may seem useless, for instance the previous
+example may also be written like this:</p>
+<pre><code>var x = &#39;Hi&#39;;
+console.log(x); // &#39;Hi&#39;
+</code></pre><p>In reality immediately invoked functions allow to preserve the current scope:</p>
+<pre><code>function example() {
+  var n = 7;
+  console.log(n);
+}
+esempio(); // 7
+console.log(n); // Error (not existent here)
+</code></pre><p>Scope will be treated in detail <a href="#scope">here</a>.</p>
+<p>JavaScript functions may be invoked with an arbitrary number of arguments:
+missing arguments will be <code>undefined</code>, while exceeding arguments will simply be
+ignored.</p>
+<pre><code>function example(x1, x2) {
+  if (x2 === undefined) {
+    console.log(x1);
+  } else {
+    console.log([ x1, x2 ]);
+  }
+}
+example(7); // 7
+example(7, 42); // [ 7, 42 ]
+example(7, 42, 666); // [ 7, 42 ]
+</code></pre><p>You can also use the keyword <code>arguments</code> which represents current arguments as
+an array:</p>
+<pre><code>function example() {
+  console.log(arguments[0]);
+  console.log(arguments[1]);
+  console.log(arguments[2]);
+  console.log(arguments.length);
+}
+example(&#39;a&#39;, &#39;b&#39;); // &#39;a&#39;, &#39;b&#39;, undefined, 2
+</code></pre><p>This makes it easy to implement function with a variable number of arguments.</p>
+<h2 id="scope">Scope</h2>
+<p>JavaScript variables have a scope that corresponds to the function in which are
+declared and includes nested functions:</p>
+<pre><code>function externalFunction() {
+  var n = 7;
+  function aNestedFunction() {
+    // n accessible here
+    function anEvenDeeperFunction() {
+      // n accessible here too
+    }
+  }
+}
+</code></pre><p>In other words, every function &quot;captures&quot; the execution context in which is
+declared. In JavaScript we call &quot;closure&quot; a function with its execution context.</p>
+<p>Closures allow to preserve an execution context even after a function returns:</p>
+<pre><code>function example(x) {
+  return function () {
+    return x;
+  }
+}
+var f = example(7);
+f(); // 7
+</code></pre><p>Here <code>f</code> preserves <code>example</code>&#39;s execution context even after <code>example</code> returns.</p>
+<p>This behavior is very powerful, but keep in mind memory usage.</p>
+<p>JavaScript variables are subjet to &quot;hoisting&quot;: when code is executed it doesn&#39;t
+matter where a declaration actually happens, declarations will always be
+executed first. For instance this code:</p>
+<pre><code>function example() {
+  console.log(&#39;hi&#39;);
+  var n = 7;
+}
+</code></pre><p>Will be executed as if it was written like this:</p>
+<pre><code>function example() {
+  var n;
+  console.log(&#39;hi&#39;);
+  n = 7;
+}
+</code></pre><p>This sometimes causes subtle bugs, so many JavaScript developers try to always
+write declarations at the beginning of a function in order to be consistent with
+actual execution.</p>
+<h2 id="objects">Objects</h2>
+<p>JavaScript objects are basically sets of name-value pairs called &quot;properties&quot;:</p>
+<pre><code>var marco = {
+  name: &#39;Marco&#39;,
+  age: 30
+};
+console.log(marco.name); // &#39;Marco&#39;
+console.log(marco.age); // 30
+</code></pre><p>Here we have an object with two properties called <code>name</code> and <code>age</code> with values
+<code>&#39;Marco&#39;</code> and <code>30</code>. The <code>.</code> operator is used to access property values given
+their names. Alternatively, you can use this syntax:</p>
+<pre><code>console.log(marco[&#39;name&#39;]); // &#39;Marco&#39;
+console.log(marco[&#39;age&#39;]); // 30
+</code></pre><p>This syntax have 2 benefits. First, it allows dynamic access:</p>
+<pre><code>var whichProperty = &#39;name&#39;;
+console.log(marco[whichProperty]); // &#39;Marco&#39;
+</code></pre><p>Second, it allows using names otherwise forbidden such as names with special
+characters or language reserved identifiers:</p>
+<pre><code>var weirdObject = {
+  &#39;property with a weird name&#39;: 42
+};
+console.log(weirdObject[&#39;property with a weird name&#39;]); // 42
+</code></pre><p>Since JavaScript functions are values, they can be assigned as property values
+and used like methods:</p>
+<pre><code>var marco = {
+  saySomething: function (what) {
+    console.log(what);
+  }
+};
+marco.saySomething(&#39;hi&#39;); // &#39;hi&#39;
+</code></pre><p>The kayword <code>this</code> can be used within a method to access other properties of
+the same object:</p>
+<pre><code>var marco = {
+  name: &#39;Marco&#39;,
+  sayHi: function () {
+    console.log(&#39;Hi, my name is &#39; + this.name);
+  }
+};
+marco.sayHi(); // &#39;Hi, my name is Marco&#39;
+</code></pre><p>Objects are always &quot;editable&quot;: you can add, delete or change values of
+properties, even when they are methods.</p>
+<pre><code>var marco = {}; // Let&#39;s start with an empty object
+marco.name = &#39;Marco&#39;; // We add a property
+// We add a method
+marco.sayHi = function () {
+  console.log(&#39;Hi, my name is &#39; + this.name);
+};
+// We add, modify and finally delete a property
+marco.age = 30;
+marco.age = 31;
+delete marco.age;
+</code></pre><p>JavaScript object properties are easily iterable:</p>
+<pre><code>var marco = { name: &#39;Marco&#39;, age: 30 };
+for (var propertyName in marco) {
+  console.log(marco[propertyName]);
+} // &#39;Marco&#39;, 30
+</code></pre><h2 id="prototypes">Prototypes</h2>
+<p>JavaScript functions may be used as object constructors:</p>
+<pre><code>function Person(name) {
+  this.name = name;
+  this.sayHi = function () {
+    console.log(&#39;Hi, my name is &#39; + this.name);
+  };
+}
+var marco = new Person(&#39;Marco&#39;);
+marco.sayHi(); // &#39;Hi, my name is Marco&#39;
+</code></pre><p>This has some benefits. First, objects created with a constructor share a
+common, extensible &quot;prototype&quot; from which they automatically inherit properties:</p>
+<pre><code>function Person(name) {
+  this.name = name;
+}
+var marco = new Person(&#39;Marco&#39;);
+var fabio = new Person(&#39;Fabio&#39;);
+Person.prototype.sayHi = function () {
+  console.log(&#39;Hi, my name is&#39; + this.nome);
+};
+marco.sayHi(); // &#39;Hi, my name isMarco&#39;
+fabio.sayHi(); // &#39;Hi, my name isFabio&#39;
+</code></pre><p>Inherited properties may be overridden:</p>
+<pre><code>function Person(name) {
+  this.name = name;
+  this.sayHi = function () {
+    console.log(&#39;Hi, my name is &#39; + this.name);
+  };
+}
+var marco = new Person(&#39;Marco&#39;);
+var fabio = new Person(&#39;Fabio&#39;);
+fabio.sayHi = function () {
+  console.log(&#39;Yo! I\&#39;m &#39; + this.nome);
+};
+marco.sayHi(); // &#39;Hi, my name is Marco&#39;
+fabio.sayHi(); // &#39;Yo! I&#39;m Fabio&#39;
+</code></pre><p>Another benefit of constructors is that they allow <code>instanceof</code> tests:</p>
+<pre><code>function Person(name) { ... }
+var marco = new Person(&#39;Marco&#39;);
+marco instanceof Persona; // true
+var cloneOfMarco = { name: &#39;Marco&#39; };
+cloneOfMarco instanceof Persona; // false
+</code></pre><p>This concludes our JavaScript overview. Other JavaScript guides may be added in
+future, so stay tuned :D</p>
+    </div>
+    <div id="disqus_thread"></div>
+    <script>
+      (function() {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://marcoliceti-xyz.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+      })();
+    </script>
+  </body>
+</html>
