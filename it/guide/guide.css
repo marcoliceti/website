@@ -20,31 +20,30 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 5vw;
-  margin-bottom: 25vw;
+  margin-top: 100px;
+  margin-bottom: 200px;
   color: rgb(64, 64, 64);
 }
 
-.guide {
+.guida {
   animation-duration: 2s;
   animation-name: fade-in;
 }
 
+.guida, #disqus_thread {
+  font-size: 17px;
+}
+
 @media screen and (orientation: landscape) {
-  .guide, #disqus_thread {
-    width: 50vw;
-    font-size: 1.5vw;
+  .guida, #disqus_thread {
+    width: 600px;
+    max-width: 50vw;
   }
 }
 
 @media screen and (orientation: portrait) {
-  .guide, #disqus_thread {
-    width: 80vw;
-    font-size: 3vw;
-  }
-
-  pre > code {
-    font-size: 3vw;
+  .guida, #disqus_thread {
+    width: 85vw;
   }
 }
 
@@ -55,11 +54,11 @@ p {
 code {
   background: rgba(244, 244, 244, 0.75);
   color: rgb(64, 64, 64);
-  padding: 0.25vw;
+  padding: 4px;
 }
 
 pre {
-  padding: 1vw;
+  padding: 10px;
   background: rgb(250, 250, 250);
   color: rgb(64, 64, 64);
   max-width: 100%;
@@ -77,5 +76,5 @@ a {
 }
 
 #disqus_thread {
-  margin-top: 5vw;
+  margin-top: 50px;
 }
