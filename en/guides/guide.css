@@ -20,8 +20,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 100px;
-  margin-bottom: 200px;
   color: rgb(64, 64, 64);
 }
 
@@ -35,13 +33,22 @@ body {
 }
 
 @media screen and (orientation: landscape) {
+  body {
+    margin-top: 100px;
+    margin-bottom: 200px;
+  }
+
   .guide, #disqus_thread {
     width: 600px;
-    max-width: 50vw;
   }
 }
 
 @media screen and (orientation: portrait) {
+  body {
+    margin-top: 5vw;
+    margin-bottom: 5vw;
+  }
+
   .guide, #disqus_thread {
     width: 85vw;
   }
