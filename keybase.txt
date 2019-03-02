@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/marcoliceti
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://marcoliceti.xyz
+  * I am marcoliceti (https://keybase.io/marcoliceti) on keybase.
+  * I have a public key ASCWeHSKDei_gi460VLH2GkXJZd3sI_xDZ1wELDADgnKxQo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01209678748a0de8bf822e3ad152c7d86917259777b08ff10d9d7010b0c00e09cac50a",
+      "host": "keybase.io",
+      "kid": "01209678748a0de8bf822e3ad152c7d86917259777b08ff10d9d7010b0c00e09cac50a",
+      "uid": "ce337dc91e93f97a5766eb8c9baaa519",
+      "username": "marcoliceti"
+    },
+    "merkle_root": {
+      "ctime": 1551533028,
+      "hash": "ac283c74515daf00b92c9ff138b0389e3f34af69a0d15f3d44841d61bdcbacaf0604dbcdc1144fd9f08323339ec9da3e9588c789349b0e56dca34c1ad14e3774",
+      "hash_meta": "485b201127203304d2ac85282a224aa88b96155fd2b9d7eaeeeeec244bec0895",
+      "seqno": 4862386
+    },
+    "service": {
+      "entropy": "SP71i5RuIl3lPVs9+P2yMZco",
+      "hostname": "marcoliceti.xyz",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "3.0.0"
+  },
+  "ctime": 1551533082,
+  "expire_in": 504576000,
+  "prev": "0256fca3f157ce46261c9a591536e2d7ab75e878535b8d1d7a2c5f9ae8da8dcf",
+  "seqno": 7,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEglnh0ig3ov4IuOtFSx9hpFyWXd7CP8Q2dcBCwwA4JysUKp3BheWxvYWTESpcCB8QgAlb8o/FXzkYmHJpZFTbi16t16HhTW40deixfmujajc/EIMHFr0v6HtvlQUjNkBPDYN+37TTtKj1ZMDojvGkwFf4gAgHCo3NpZ8RAwXbDOLg95d7MD4C1Msy2zfnac5Vv2fGuHYg/1yNgqs2SBIae0dgbMDK0AkbLzfYV5kMxqf00UNE6lmmUoMf+AKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIDVnyqDJ7mD7slv8J7B7+MzdFaV7NDDVN1X8hLrgVrVoo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/marcoliceti
+
+==================================================================
